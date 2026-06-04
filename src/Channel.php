@@ -11,8 +11,8 @@
 namespace Nexph\Runtime;
 
 use Fiber;
-use Nexph\Runtime\Cancellation\CancellationToken;
-use Nexph\Runtime\Cancellation\CancelledException;
+use Nexph\Core\Cancellation\CancellationToken;
+use Nexph\Core\Cancellation\CancelledException;
 
 /**
  * Lightweight channel for coroutine communication.

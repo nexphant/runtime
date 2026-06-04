@@ -11,7 +11,7 @@
 namespace Nexph\Runtime;
 
 use Fiber;
-use Nexph\Runtime\Context\ContextStore;
+use Nexph\Core\Context\ContextStore;
 
 /**
  * Lightweight cooperative event loop.

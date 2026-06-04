@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Nexph\Runtime\Observability;
 
-use Nexph\Runtime\Resource\ResourceRegistry;
-use Nexph\Runtime\Ownership\OwnerRegistry;
+use Nexph\Core\Resource\ResourceRegistry;
+use Nexph\Core\Ownership\OwnerRegistry;
 
 /**
  * Leak snapshot with grouping and analysis

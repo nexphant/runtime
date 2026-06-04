@@ -16,13 +16,13 @@ use Nexph\Runtime\Backpressure\Semaphore;
 use Nexph\Runtime\Cancellation\CancellationSource;
 use Nexph\Runtime\Cancellation\CancelledException;
 use Nexph\Runtime\Cancellation\Deadline;
-use Nexph\Runtime\Context\ContextStore;
-use Nexph\Runtime\Context\RuntimeContext;
+use Nexph\Core\Context\ContextStore;
+use Nexph\Core\Context\RuntimeContext;
 use Nexph\Runtime\Metrics\RuntimeMetrics;
 use Nexph\Runtime\Observability\LeakSnapshot;
-use Nexph\Runtime\Ownership\OwnerRegistry;
-use Nexph\Runtime\Ownership\OwnerType;
-use Nexph\Runtime\Resource\ResourceRegistry;
+use Nexph\Core\Ownership\OwnerRegistry;
+use Nexph\Core\Ownership\OwnerType;
+use Nexph\Core\Resource\ResourceRegistry;
 
 /**
  * Adaptive stateful runtime layer for Nexph.

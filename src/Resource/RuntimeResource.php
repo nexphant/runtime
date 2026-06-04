@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Nexph\Runtime\Resource;
 
-use Nexph\Runtime\Ownership\OwnerId;
+use Nexph\Core\Ownership\OwnerId;
 
 /**
  * Contract for trackable runtime resources

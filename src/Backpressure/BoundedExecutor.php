@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Nexph\Runtime\Backpressure;
 
-use Nexph\Runtime\Cancellation\CancellationToken;
-use Nexph\Runtime\Context\ContextStore;
-use Nexph\Runtime\Ownership\OwnerType;
+use Nexph\Core\Cancellation\CancellationToken;
+use Nexph\Core\Context\ContextStore;
+use Nexph\Core\Ownership\OwnerType;
 
 /**
  * Executor with bounded concurrency and queue

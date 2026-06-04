@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Nexph\Runtime\Backpressure;
 
-use Nexph\Runtime\Cancellation\CancellationToken;
-use Nexph\Runtime\Cancellation\CancelledException;
-use Nexph\Runtime\Cancellation\Deadline;
-use Nexph\Runtime\Cancellation\DeadlineExceededException;
-use Nexph\Runtime\Ownership\OwnerId;
+use Nexph\Core\Cancellation\CancellationToken;
+use Nexph\Core\Cancellation\CancelledException;
+use Nexph\Core\Cancellation\Deadline;
+use Nexph\Core\Cancellation\DeadlineExceededException;
+use Nexph\Core\Ownership\OwnerId;
 
 /**
  * Counting semaphore for resource limiting

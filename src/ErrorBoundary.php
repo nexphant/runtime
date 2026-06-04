@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Nexph\Runtime;
 
-use Nexph\Runtime\Ownership\OwnerType;
+use Nexph\Core\Ownership\OwnerType;
 
 final class ErrorBoundary
 {

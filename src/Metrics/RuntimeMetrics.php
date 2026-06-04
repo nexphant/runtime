@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Nexph\Runtime\Metrics;
 
-use Nexph\Runtime\Ownership\OwnerRegistry;
-use Nexph\Runtime\Resource\ResourceRegistry;
+use Nexph\Core\Ownership\OwnerRegistry;
+use Nexph\Core\Resource\ResourceRegistry;
 
 /**
  * Runtime metrics tracker for tasks, fibers, and resources

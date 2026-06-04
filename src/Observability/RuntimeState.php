@@ -10,7 +10,7 @@
  */
 namespace Nexph\Runtime\Observability;
 
-use Nexph\Runtime\Queue\QueueFactory;
+use Nexph\Queue\QueueFactory;
 use Nexph\Runtime\Runtime;
 
 class RuntimeState {

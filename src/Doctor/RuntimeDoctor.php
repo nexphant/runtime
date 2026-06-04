@@ -5,7 +5,7 @@ namespace Nexph\Runtime\Doctor;
 
 use Nexph\Runtime\Runtime;
 use Nexph\Runtime\Fiber\FiberRegistry;
-use Nexph\Runtime\Drain\DrainController;
+use Nexph\Core\Drain\DrainController;
 
 final class RuntimeDoctor
 {

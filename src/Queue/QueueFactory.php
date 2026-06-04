@@ -10,12 +10,12 @@
  */
 namespace Nexph\Runtime\Queue;
 
-use Nexph\Runtime\Queue\Drivers\MemoryDriver;
-use Nexph\Runtime\Queue\Drivers\FileDriver;
-use Nexph\Runtime\Queue\Drivers\DatabaseDriver;
-use Nexph\Runtime\Queue\Drivers\ApcuDriver;
-use Nexph\Runtime\Queue\Drivers\ApcuRingDriver;
-use Nexph\Runtime\Queue\Drivers\RedisDriver;
+use Nexph\Queue\Drivers\MemoryDriver;
+use Nexph\Queue\Drivers\FileDriver;
+use Nexph\Queue\Drivers\DatabaseDriver;
+use Nexph\Queue\Drivers\ApcuDriver;
+use Nexph\Queue\Drivers\ApcuRingDriver;
+use Nexph\Queue\Drivers\RedisDriver;
 
 class QueueFactory {
     public static function create(string|array $config = [], array $options = []): Queue {

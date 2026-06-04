@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Nexph\Runtime\Observability;
 
-use Nexph\Runtime\Context\ContextStore;
+use Nexph\Core\Context\ContextStore;
 
 /**
  * Processor that adds runtime context to log records

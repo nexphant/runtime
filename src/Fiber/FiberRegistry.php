@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Nexph\Runtime\Fiber;
 
-use Nexph\Runtime\Ownership\OwnerId;
-use Nexph\Runtime\Context\RuntimeContext;
+use Nexph\Core\Ownership\OwnerId;
+use Nexph\Core\Context\RuntimeContext;
 
 final class FiberRegistry
 {

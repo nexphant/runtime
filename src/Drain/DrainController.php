@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Nexph\Runtime\Drain;
 
-use Nexph\Runtime\Ownership\OwnerId;
-use Nexph\Runtime\Cancellation\CancellationSource;
+use Nexph\Core\Ownership\OwnerId;
+use Nexph\Core\Cancellation\CancellationSource;
 
 /**
  * Controller for graceful shutdown and draining
