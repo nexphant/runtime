@@ -12,7 +12,8 @@
         "php": ">=8.1",
         "ext-pcntl": "*",
         "ext-posix": "*",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "nexph/core": "^0.1"
     },
     "suggest": {
         "ext-apcu": "For runtime cache and APCu queue driver",
