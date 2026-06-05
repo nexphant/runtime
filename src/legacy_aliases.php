@@ -23,3 +23,7 @@ class_alias(\Nexph\Queue\Drivers\DatabaseDriver::class, 'Nexph\Runtime\Queue\Dri
 class_alias(\Nexph\Queue\Drivers\ApcuDriver::class, 'Nexph\Runtime\Queue\Drivers\ApcuDriver');
 class_alias(\Nexph\Queue\Drivers\ApcuRingDriver::class, 'Nexph\Runtime\Queue\Drivers\ApcuRingDriver');
 class_alias(\Nexph\Queue\Drivers\RedisDriver::class, 'Nexph\Runtime\Queue\Drivers\RedisDriver');
+class_alias(\Nexph\Observability\Logger\Logger::class, 'Nexph\Runtime\Observability\Logger');
+class_alias(\Nexph\Observability\Metrics\RuntimeMetrics::class, 'Nexph\Runtime\Metrics\RuntimeMetrics');
+class_alias(\Nexph\Observability\Leak\LeakSnapshot::class, 'Nexph\Runtime\Observability\LeakSnapshot');
+class_alias(\Nexph\Observability\Doctor\RuntimeDoctor::class, 'Nexph\Runtime\Doctor\RuntimeDoctor');
