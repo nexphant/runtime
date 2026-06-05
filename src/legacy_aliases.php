@@ -14,3 +14,12 @@ class_alias(\Nexph\Core\Cancellation\Deadline::class, 'Nexph\Runtime\Cancellatio
 class_alias(\Nexph\Core\Cancellation\DeadlineExceededException::class, 'Nexph\Runtime\Cancellation\DeadlineExceededException');
 class_alias(\Nexph\Core\Drain\DrainController::class, 'Nexph\Runtime\Drain\DrainController');
 class_alias(\Nexph\Queue\QueueFactory::class, 'Nexph\Runtime\Queue\QueueFactory');
+class_alias(\Nexph\Queue\Queue::class, 'Nexph\Runtime\Queue\Queue');
+class_alias(\Nexph\Queue\Job::class, 'Nexph\Runtime\Queue\Job');
+class_alias(\Nexph\Queue\QueueDriver::class, 'Nexph\Runtime\Queue\QueueDriver');
+class_alias(\Nexph\Queue\Drivers\MemoryDriver::class, 'Nexph\Runtime\Queue\Drivers\MemoryDriver');
+class_alias(\Nexph\Queue\Drivers\FileDriver::class, 'Nexph\Runtime\Queue\Drivers\FileDriver');
+class_alias(\Nexph\Queue\Drivers\DatabaseDriver::class, 'Nexph\Runtime\Queue\Drivers\DatabaseDriver');
+class_alias(\Nexph\Queue\Drivers\ApcuDriver::class, 'Nexph\Runtime\Queue\Drivers\ApcuDriver');
+class_alias(\Nexph\Queue\Drivers\ApcuRingDriver::class, 'Nexph\Runtime\Queue\Drivers\ApcuRingDriver');
+class_alias(\Nexph\Queue\Drivers\RedisDriver::class, 'Nexph\Runtime\Queue\Drivers\RedisDriver');
