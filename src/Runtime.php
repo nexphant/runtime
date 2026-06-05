@@ -101,6 +101,23 @@ class Runtime {
     }
     
     /**
+     * Create a channel.
+     */
+    public static function channel(int $capacity = 0): Channel {
+        return new Channel($capacity);
+    }
+    
+    /**
+     * Create a timer.
+     */
+    public static function timer(float $seconds, callable $callback, bool $repeat = false): int {
+        if (!self::available()) {
+            return 0;
+        }
+        return self::loop()->timer($seconds, $callback, $repeat);
+    }
+    
+    /**
      * Get runtime metrics snapshot.
      */
     public static function metrics(): RuntimeMetrics {
@@ -259,6 +276,13 @@ class Runtime {
      */
     public static function owner(): ?string {
         return self::context()->ownerId();
+    }
+    
+    /**
+     * Get drain controller.
+     */
+    public static function drain(): \Nexph\Core\Drain\DrainController {
+        return \Nexph\Core\Drain\DrainController::instance();
     }
     
     /**
