@@ -129,8 +129,8 @@ class Schedule {
         $this->running = false;
         
         // Integrate with DrainController
-        if (class_exists('\Nexph\Runtime\Drain\DrainController')) {
-            \Nexph\Runtime\Drain\DrainController::instance()->stopAccepting();
+        if (class_exists('\Nexph\Core\Drain\DrainController')) {
+            \Nexph\Core\Drain\DrainController::instance()->stopAccepting();
         }
         
         foreach ($this->timers as $timerId) {

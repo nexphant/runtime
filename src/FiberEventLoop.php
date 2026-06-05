@@ -63,7 +63,7 @@ class FiberEventLoop {
         // Create timer owner
         $timerOwner = class_exists('\Nexph\Runtime\Runtime') && \Nexph\Runtime\Runtime::available()
             ? \Nexph\Runtime\Runtime::owners()->open(
-                \Nexph\Runtime\Ownership\OwnerType::TIMER,
+                \Nexph\Core\Ownership\OwnerType::TIMER,
                 $parentOwnerId ? \Nexph\Runtime\Runtime::owners()->get($parentOwnerId)?->id() : null,
                 ['interval' => $seconds, 'repeat' => $repeat]
             )
@@ -82,8 +82,8 @@ class FiberEventLoop {
         $this->timerHeap->insert($id, -$next);
         
         // Track timer as resource
-        if (class_exists('\Nexph\Runtime\Resource\ResourceRegistry') && $timerOwner) {
-            \Nexph\Runtime\Resource\ResourceRegistry::instance()->track(
+        if (class_exists('\Nexph\Core\Resource\ResourceRegistry') && $timerOwner) {
+            \Nexph\Core\Resource\ResourceRegistry::instance()->track(
                 (object)['timer_id' => $id],
                 'timer',
                 $timerOwner->id()
@@ -213,8 +213,8 @@ class FiberEventLoop {
             } catch (\Throwable $e) {
                 error_log("Coroutine error: " . $e->getMessage());
                 
-                if (class_exists('\Nexph\Runtime\Context\ContextStore')) {
-                    $ctx = \Nexph\Runtime\Context\ContextStore::instance()->current();
+                if (class_exists('\Nexph\Core\Context\ContextStore')) {
+                    $ctx = \Nexph\Core\Context\ContextStore::instance()->current();
                     $ownerId = $ctx->ownerId();
                     if ($ownerId && class_exists('\Nexph\Runtime\Runtime')) {
                         $owner = \Nexph\Runtime\Runtime::owners()->get($ownerId);
@@ -253,8 +253,8 @@ class FiberEventLoop {
             $this->timerHeap->extract();
             
             // Check drain state before executing timer
-            if (class_exists('\Nexph\Runtime\Drain\DrainController')) {
-                $drainController = \Nexph\Runtime\Drain\DrainController::instance();
+            if (class_exists('\Nexph\Core\Drain\DrainController')) {
+                $drainController = \Nexph\Core\Drain\DrainController::instance();
                 if (!$drainController->isAccepting()) {
                     // Skip timer execution during drain
                     if ($timer['owner'] ?? null) {

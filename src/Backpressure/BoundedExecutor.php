@@ -91,7 +91,7 @@ final class BoundedExecutor
             \Nexph\Runtime\Runtime::spawn(function() use ($task, $token, $context) {
                 $parentOwnerId = $context->ownerId();
                 $taskOwner = \Nexph\Runtime\Runtime::owners()->open(
-                    \Nexph\Runtime\Ownership\OwnerType::EXECUTOR_TASK,
+                    \Nexph\Core\Ownership\OwnerType::EXECUTOR_TASK,
                     $parentOwnerId ? \Nexph\Runtime\Runtime::owners()->get($parentOwnerId)?->id() : null,
                     ['executor' => 'bounded']
                 );
@@ -99,7 +99,7 @@ final class BoundedExecutor
                 try {
                     $token?->throwIfCancelled();
                     $taskContext = $context->with(['owner_id' => $taskOwner->id()->toString(), 'owner_type' => 'executor_task']);
-                    \Nexph\Runtime\Context\ContextStore::instance()->runWith($taskContext, $task);
+                    \Nexph\Core\Context\ContextStore::instance()->runWith($taskContext, $task);
                     $this->metrics['completed']++;
                 } catch (\Throwable $e) {
                     $this->metrics['failed']++;

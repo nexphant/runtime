@@ -43,7 +43,7 @@ class Worker {
         echo "[Worker] Starting...\n";
         
         while (!self::$shouldStop) {
-            $drain = \Nexph\Runtime\Drain\DrainController::instance();
+            $drain = \Nexph\Core\Drain\DrainController::instance();
             
             if ($drain->isDraining() || $drain->isStopped()) {
                 echo "[Worker] Drain active, waiting...\n";

@@ -35,9 +35,9 @@ class Channel {
         $this->capacity = max(0, $capacity);
         
         // Track channel as resource
-        if (class_exists('\Nexph\Runtime\Resource\ResourceRegistry') && class_exists('\Nexph\Runtime\Runtime') && \Nexph\Runtime\Runtime::available()) {
+        if (class_exists('\Nexph\Core\Resource\ResourceRegistry') && class_exists('\Nexph\Runtime\Runtime') && \Nexph\Runtime\Runtime::available()) {
             $this->resourceId = bin2hex(random_bytes(16));
-            \Nexph\Runtime\Resource\ResourceRegistry::instance()->track(
+            \Nexph\Core\Resource\ResourceRegistry::instance()->track(
                 $this,
                 'channel',
                 \Nexph\Runtime\Runtime::context()->ownerId()
@@ -221,8 +221,8 @@ class Channel {
         $this->recvHead = 0;
         
         // Release from resource registry
-        if ($this->resourceId && class_exists('\Nexph\Runtime\Resource\ResourceRegistry')) {
-            \Nexph\Runtime\Resource\ResourceRegistry::instance()->release($this->resourceId);
+        if ($this->resourceId && class_exists('\Nexph\Core\Resource\ResourceRegistry')) {
+            \Nexph\Core\Resource\ResourceRegistry::instance()->release($this->resourceId);
         }
     }
 
