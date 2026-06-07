@@ -42,10 +42,15 @@ class SysvMessageBus implements MessageBusInterface
         return $stats && $stats['msg_qnum'] > 0;
     }
 
-    public function __destruct()
+    public function destroy(): void
     {
         if ($this->queue) {
             @msg_remove_queue($this->queue);
+            $this->queue = null;
         }
+    }
+
+    public function __destruct()
+    {
     }
 }
