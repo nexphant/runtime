@@ -57,7 +57,7 @@ class RuntimeConfigResolver
                 'max_write_callbacks_per_tick' => 256,
                 'max_deferred_per_tick' => 256,
                 'keep_alive_timeout' => 5,
-                'keep_alive_max_requests' => 100,
+                'keep_alive_max_requests' => 10000,
                 'features' => [
                     'metrics' => false,
                     'object_tracking' => false,
@@ -105,7 +105,7 @@ class RuntimeConfigResolver
                 'max_write_callbacks_per_tick' => 128,
                 'max_deferred_per_tick' => 128,
                 'keep_alive_timeout' => 2,
-                'keep_alive_max_requests' => 50,
+                'keep_alive_max_requests' => 10000,
                 'features' => [
                     'metrics' => false,
                     'object_tracking' => false,
@@ -147,4 +147,3 @@ class RuntimeConfigResolver
         return new RuntimeConfig($profile->toArray());
     }
 }
-
