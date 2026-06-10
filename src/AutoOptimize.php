@@ -20,7 +20,7 @@ class AutoOptimize
         $this->manifest->load();
 
         if ($this->manifest->isStale($files)) {
-            $this->compiler->compile();
+            $this->compiler->compile($files);
             $this->manifest->save($files);
         }
         
