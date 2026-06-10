@@ -11,7 +11,7 @@ class OptimizeCompiler
     public function __construct(string $storagePath, ?string $basePath = null)
     {
         $this->compiledPath = $storagePath . '/nexph/compiled';
-        $this->basePath = $basePath ?? dirname($storagePath);
+        $this->basePath = $basePath ?? getcwd();
     }
 
     public function compile(array $sourceFiles = []): void
@@ -26,7 +26,10 @@ class OptimizeCompiler
         $this->compileContainer();
         $this->compileConfig();
         $this->compileSchedule();
+        $this->compileClassmap();
+        $this->compileFiles();
         $this->compilePreload();
+        $this->compileBoot();
     }
 
     private function compileRoutes(): void
@@ -92,6 +95,28 @@ class OptimizeCompiler
         );
     }
 
+    private function compileClassmap(): void
+    {
+        $classmap = [];
+        foreach ($this->runtimeFiles() as $file) {
+            foreach ($this->classesInFile($file) as $class) {
+                $classmap[$class] = $file;
+            }
+        }
+        ksort($classmap);
+        $this->writeArray('classmap.php', $classmap);
+    }
+
+    private function compileFiles(): void
+    {
+        $files = [];
+        $helpers = $this->basePath . '/packages/server/src/helpers.php';
+        if (is_file($helpers)) {
+            $files[] = $helpers;
+        }
+        $this->writeArray('files.php', $files);
+    }
+
     private function compilePreload(): void
     {
         $this->writeArray('preload.php', [
@@ -101,6 +126,40 @@ class OptimizeCompiler
             \Nexph\Server\HttpServer::class,
             \Nexph\Server\Router::class,
         ]);
+    }
+
+    private function compileBoot(): void
+    {
+        $code = <<<'PHP'
+<?php
+$compiled = __DIR__;
+$classmap = require $compiled . '/classmap.php';
+$files = require $compiled . '/files.php';
+
+spl_autoload_register(static function (string $class) use ($classmap): void {
+    if (isset($classmap[$class])) {
+        require $classmap[$class];
+    }
+}, true, true);
+
+foreach ($files as $file) {
+    require_once $file;
+}
+
+if (class_exists(\Nexph\Runtime\CompiledHotPath::class)) {
+    \Nexph\Runtime\CompiledHotPath::load($compiled);
+}
+
+return [
+    'manifest' => is_file($compiled . '/manifest.php') ? require $compiled . '/manifest.php' : [],
+    'classmap' => $classmap,
+    'files' => $files,
+    'config' => is_file($compiled . '/config.php') ? require $compiled . '/config.php' : [],
+    'routes' => is_file($compiled . '/routes.php') ? require $compiled . '/routes.php' : [],
+    'container' => is_file($compiled . '/container.php') ? require $compiled . '/container.php' : [],
+];
+PHP;
+        file_put_contents($this->compiledPath . '/boot.php', $code . "\n");
     }
 
     private function writeArray(string $file, array $data): void
@@ -142,6 +201,96 @@ class OptimizeCompiler
                 $files[] = $path;
             }
         }
+    }
+
+    private function runtimeFiles(): array
+    {
+        $files = [];
+        foreach (glob($this->basePath . '/packages/*/src', GLOB_ONLYDIR) ?: [] as $dir) {
+            $this->collectPhpFiles($dir, $files, 0);
+        }
+        sort($files);
+        return $files;
+    }
+
+    private function classesInFile(string $file): array
+    {
+        $tokens = token_get_all((string) file_get_contents($file));
+        $namespace = '';
+        $classes = [];
+        $count = count($tokens);
+        for ($i = 0; $i < $count; $i++) {
+            $token = $tokens[$i];
+            if (!is_array($token)) {
+                continue;
+            }
+            if ($token[0] === T_NAMESPACE) {
+                $namespace = $this->readNamespace($tokens, $i + 1);
+                continue;
+            }
+            if (in_array($token[0], [T_CLASS, T_INTERFACE, T_TRAIT, T_ENUM], true)) {
+                if ($token[0] === T_CLASS && ($this->isAnonymousClass($tokens, $i) || $this->isClassConstant($tokens, $i))) {
+                    continue;
+                }
+                $name = $this->readClassName($tokens, $i + 1);
+                if ($name !== '') {
+                    $classes[] = ltrim($namespace . '\\' . $name, '\\');
+                }
+            }
+        }
+        return $classes;
+    }
+
+    private function readNamespace(array $tokens, int $start): string
+    {
+        $name = '';
+        $count = count($tokens);
+        for ($i = $start; $i < $count; $i++) {
+            $token = $tokens[$i];
+            if ($token === ';' || $token === '{') {
+                break;
+            }
+            if (is_array($token) && in_array($token[0], [T_STRING, T_NAME_QUALIFIED, T_NS_SEPARATOR], true)) {
+                $name .= $token[1];
+            }
+        }
+        return $name;
+    }
+
+    private function readClassName(array $tokens, int $start): string
+    {
+        $count = count($tokens);
+        for ($i = $start; $i < $count; $i++) {
+            $token = $tokens[$i];
+            if (is_array($token) && $token[0] === T_STRING) {
+                return $token[1];
+            }
+        }
+        return '';
+    }
+
+    private function isAnonymousClass(array $tokens, int $index): bool
+    {
+        for ($i = $index - 1; $i >= 0; $i--) {
+            $token = $tokens[$i];
+            if (is_array($token) && in_array($token[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true)) {
+                continue;
+            }
+            return is_array($token) && $token[0] === T_NEW;
+        }
+        return false;
+    }
+
+    private function isClassConstant(array $tokens, int $index): bool
+    {
+        for ($i = $index - 1; $i >= 0; $i--) {
+            $token = $tokens[$i];
+            if (is_array($token) && in_array($token[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true)) {
+                continue;
+            }
+            return is_array($token) && $token[0] === T_DOUBLE_COLON;
+        }
+        return false;
     }
 
     private function readSources(): array
