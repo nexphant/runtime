@@ -7,6 +7,7 @@ class BoundedExecutor
     private int $maxConcurrency;
     private int $running = 0;
     private array $queue = [];
+    private int $queueHead = 0;
 
     public function __construct(int $maxConcurrency)
     {
@@ -25,19 +26,51 @@ class BoundedExecutor
     private function run(callable $task): void
     {
         $this->running++;
-        try {
-            $task();
-        } finally {
-            $this->running--;
-            $this->processQueue();
-        }
+        
+        $fiber = new \Fiber(function() use ($task) {
+            try {
+                $task();
+            } finally {
+                $this->running--;
+                $this->processQueue();
+            }
+        });
+        
+        $fiber->start();
     }
 
     private function processQueue(): void
     {
-        if (!empty($this->queue) && $this->running < $this->maxConcurrency) {
-            $task = array_shift($this->queue);
+        if ($this->queueCount() > 0 && $this->running < $this->maxConcurrency) {
+            $task = $this->dequeue();
             $this->run($task);
         }
+    }
+    
+    private function queueCount(): int
+    {
+        return count($this->queue) - $this->queueHead;
+    }
+    
+    private function dequeue(): mixed
+    {
+        $value = $this->queue[$this->queueHead++];
+        
+        if ($this->queueHead > 64 && $this->queueHead * 2 >= count($this->queue)) {
+            $this->queue = array_slice($this->queue, $this->queueHead);
+            $this->queueHead = 0;
+        }
+        
+        return $value;
+    }
+    
+    public function running(): int
+    {
+        return $this->running;
+    }
+    
+    public function queued(): int
+    {
+        return $this->queueCount();
     }
 }

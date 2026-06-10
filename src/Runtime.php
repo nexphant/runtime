@@ -109,6 +109,60 @@ class Runtime {
     }
     
     /**
+     * Detached fiber with explicit owner
+     */
+    public static function detached(callable $fn, \Nexph\Lifecycle\Owner $owner): void {
+        if ($owner instanceof \Nexph\Lifecycle\RequestOwner || $owner instanceof \Nexph\Lifecycle\ChildFiberOwner) {
+            throw new \InvalidArgumentException('Detached fiber requires explicit non-request owner');
+        }
+
+        if (!self::available()) {
+            $childCtx = new \Nexph\Lifecycle\ChildFiberOwner($owner instanceof \Nexph\Lifecycle\OwnerScope ? $owner : null);
+            $owner->child($childCtx);
+            try {
+                $fn($childCtx);
+            } finally {
+                $childCtx->close();
+            }
+            return;
+        }
+        
+        $fiber = new \Fiber(function() use ($fn, $owner) {
+            $childCtx = new \Nexph\Lifecycle\ChildFiberOwner($owner instanceof \Nexph\Lifecycle\OwnerScope ? $owner : null);
+            $owner->child($childCtx);
+            try {
+                $fn($childCtx);
+            } finally {
+                $childCtx->close();
+            }
+        });
+        
+        $fiber->start();
+    }
+    
+    /**
+     * Get queue runtime
+     */
+    public static function queue(string $name = 'default'): \Nexph\Queue\QueueRuntime {
+        static $queues = [];
+        if (!isset($queues[$name])) {
+            $queues[$name] = new \Nexph\Queue\QueueRuntime();
+        }
+        return $queues[$name];
+    }
+    
+    /**
+     * Get scheduler runtime
+     */
+    public static function schedule(): \Nexph\Scheduler\SchedulerRuntime {
+        static $scheduler = null;
+        if ($scheduler === null) {
+            $scheduler = new \Nexph\Scheduler\SchedulerRuntime();
+        }
+        return $scheduler;
+    }
+    
+    /**
      * Create a timer.
      */
     public static function timer(float $seconds, callable $callback, bool $repeat = false): int {
