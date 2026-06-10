@@ -133,12 +133,74 @@ class OptimizeCompiler
         $code = <<<'PHP'
 <?php
 $compiled = __DIR__;
-$classmap = require $compiled . '/classmap.php';
-$files = require $compiled . '/files.php';
+$root = dirname($compiled, 3);
+$vendor = $root . '/vendor/autoload.php';
+$classmap = is_file($compiled . '/classmap.php') ? require $compiled . '/classmap.php' : [];
+$files = is_file($compiled . '/files.php') ? require $compiled . '/files.php' : [];
+$preload = is_file($compiled . '/preload.php') ? require $compiled . '/preload.php' : [];
+$opcache = function_exists('opcache_compile_file')
+    && filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN)
+    && (PHP_SAPI !== 'cli' || filter_var(ini_get('opcache.enable_cli'), FILTER_VALIDATE_BOOLEAN));
+$loaded = static function (string $class): bool {
+    return class_exists($class, false)
+        || interface_exists($class, false)
+        || trait_exists($class, false)
+        || (function_exists('enum_exists') && enum_exists($class, false));
+};
 
-spl_autoload_register(static function (string $class) use ($classmap): void {
-    if (isset($classmap[$class])) {
-        require $classmap[$class];
+if (!$opcache) {
+    if (is_file($vendor)) {
+        require_once $vendor;
+    }
+    if (class_exists(\Nexph\Runtime\CompiledHotPath::class)) {
+        \Nexph\Runtime\CompiledHotPath::load($compiled);
+    }
+    return [
+        'mode' => 'composer',
+        'opcache' => false,
+        'manifest' => is_file($compiled . '/manifest.php') ? require $compiled . '/manifest.php' : [],
+        'classmap' => $classmap,
+        'files' => $files,
+        'preload' => $preload,
+        'config' => is_file($compiled . '/config.php') ? require $compiled . '/config.php' : [],
+        'routes' => is_file($compiled . '/routes.php') ? require $compiled . '/routes.php' : [],
+        'container' => is_file($compiled . '/container.php') ? require $compiled . '/container.php' : [],
+    ];
+}
+
+$compile = static function (string $file): void {
+    if (is_file($file)) {
+        @opcache_compile_file($file);
+    }
+};
+
+foreach ([
+    $compiled . '/boot.php',
+    $compiled . '/classmap.php',
+    $compiled . '/files.php',
+    $compiled . '/config.php',
+    $compiled . '/routes.php',
+    $compiled . '/container.php',
+    $compiled . '/preload.php',
+    $compiled . '/manifest.php',
+] as $file) {
+    $compile($file);
+}
+
+foreach ($preload as $class) {
+    $class = (string) $class;
+    if (!$loaded($class) && isset($classmap[$class])) {
+        $compile($classmap[$class]);
+    }
+}
+
+foreach ($files as $file) {
+    $compile($file);
+}
+
+spl_autoload_register(static function (string $class) use ($classmap, $loaded): void {
+    if (isset($classmap[$class]) && !$loaded($class)) {
+        require_once $classmap[$class];
     }
 }, true, true);
 
@@ -151,9 +213,12 @@ if (class_exists(\Nexph\Runtime\CompiledHotPath::class)) {
 }
 
 return [
+    'mode' => 'compiled',
+    'opcache' => true,
     'manifest' => is_file($compiled . '/manifest.php') ? require $compiled . '/manifest.php' : [],
     'classmap' => $classmap,
     'files' => $files,
+    'preload' => $preload,
     'config' => is_file($compiled . '/config.php') ? require $compiled . '/config.php' : [],
     'routes' => is_file($compiled . '/routes.php') ? require $compiled . '/routes.php' : [],
     'container' => is_file($compiled . '/container.php') ? require $compiled . '/container.php' : [],

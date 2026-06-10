@@ -15,7 +15,7 @@ class OptimizeLoader
             return;
         }
         self::$initialized = true;
-        self::$opcacheEnabled = function_exists('opcache_get_status') && opcache_get_status() !== false;
+        self::$opcacheEnabled = self::detectOpcache();
         self::$apcuEnabled = function_exists('apcu_enabled') && apcu_enabled();
     }
 
@@ -43,6 +43,20 @@ class OptimizeLoader
             }
         }
         return $loaded;
+    }
+
+    public static function compileFiles(array $files): int
+    {
+        if (!self::opcacheEnabled() || !function_exists('opcache_compile_file')) {
+            return 0;
+        }
+        $compiled = 0;
+        foreach ($files as $file) {
+            if (is_string($file) && is_file($file) && @opcache_compile_file($file)) {
+                $compiled++;
+            }
+        }
+        return $compiled;
     }
 
     public static function cacheClassmap(array $classmap, int $ttl = 3600): bool
@@ -78,5 +92,19 @@ class OptimizeLoader
             'apcu' => self::$apcuEnabled,
             'preloaded' => self::preloadClasses($classes),
         ];
+    }
+
+    private static function detectOpcache(): bool
+    {
+        if (!function_exists('opcache_compile_file')) {
+            return false;
+        }
+        if (!filter_var(ini_get('opcache.enable'), FILTER_VALIDATE_BOOLEAN)) {
+            return false;
+        }
+        if (PHP_SAPI === 'cli' && !filter_var(ini_get('opcache.enable_cli'), FILTER_VALIDATE_BOOLEAN)) {
+            return false;
+        }
+        return true;
     }
 }
