@@ -6,10 +6,12 @@ class OptimizeCompiler
 {
     private string $compiledPath;
     private array $sourceFiles = [];
+    private string $basePath;
 
-    public function __construct(string $storagePath)
+    public function __construct(string $storagePath, ?string $basePath = null)
     {
         $this->compiledPath = $storagePath . '/nexph/compiled';
+        $this->basePath = $basePath ?? dirname($storagePath);
     }
 
     public function compile(array $sourceFiles = []): void
@@ -18,7 +20,7 @@ class OptimizeCompiler
             mkdir($this->compiledPath, 0755, true);
         }
 
-        $this->sourceFiles = $sourceFiles !== [] ? $sourceFiles : $this->discoverSourceFiles();
+        $this->sourceFiles = $sourceFiles !== [] ? $sourceFiles : $this->sourceFiles();
         $this->compileRoutes();
         $this->compileMiddleware();
         $this->compileContainer();
@@ -109,17 +111,37 @@ class OptimizeCompiler
         );
     }
 
-    private function discoverSourceFiles(): array
+    public function sourceFiles(?string $basePath = null): array
     {
-        $root = getcwd();
+        $root = $basePath ?? $this->basePath;
         $files = [];
-        foreach (['app.php', 'test.php', 'test_app.php', 'routes/web.php', 'routes/api.php', 'config/app.php'] as $file) {
-            $path = $root . '/' . $file;
-            if (is_file($path)) {
+        foreach (glob($root . '/*.php') ?: [] as $file) {
+            $files[] = $file;
+        }
+        foreach (['routes', 'config'] as $dir) {
+            $this->collectPhpFiles($root . '/' . $dir, $files, 0);
+        }
+        sort($files);
+        return $files;
+    }
+
+    private function collectPhpFiles(string $dir, array &$files, int $depth): void
+    {
+        if ($depth > 4 || !is_dir($dir)) {
+            return;
+        }
+
+        foreach (scandir($dir) ?: [] as $entry) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+            $path = $dir . '/' . $entry;
+            if (is_dir($path)) {
+                $this->collectPhpFiles($path, $files, $depth + 1);
+            } elseif (str_ends_with($entry, '.php')) {
                 $files[] = $path;
             }
         }
-        return $files;
     }
 
     private function readSources(): array
@@ -172,11 +194,13 @@ class OptimizeCompiler
             $kind = strtolower($match[1]);
             $args = $this->splitArgs($match[6]);
             $payload = $args[0] ?? '';
+            $payloadValue = $this->literalValue($payload);
             $routes['fast'][] = [
                 'method' => $match[3],
                 'path' => $this->joinPath($prefix, $match[5]),
                 'type' => $kind,
                 'payload' => trim($payload),
+                'payload_value' => $payloadValue,
                 'status' => isset($args[1]) && is_numeric(trim($args[1])) ? (int) trim($args[1]) : 200,
                 'file' => $file,
             ];
@@ -297,8 +321,17 @@ class OptimizeCompiler
     private function literalArray(string $source): ?array
     {
         try {
-            $value = eval('return ' . $source . ';');
+            $value = $this->literalValue($source);
             return is_array($value) ? $value : null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    private function literalValue(string $source): mixed
+    {
+        try {
+            return eval('return ' . $source . ';');
         } catch (\Throwable) {
             return null;
         }

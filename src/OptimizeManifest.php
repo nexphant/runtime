@@ -51,6 +51,8 @@ class OptimizeManifest
     private function hashFiles(array $files): string
     {
         $hash = '';
+        $files[] = __DIR__ . '/OptimizeCompiler.php';
+        $files[] = __FILE__;
         foreach ($files as $file) {
             if (file_exists($file)) {
                 $hash .= md5_file($file);
