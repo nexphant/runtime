@@ -3,7 +3,7 @@
 /**
  * This file is part of the Nexph Framework.
  *
- * (c) Nexphlabs <https://github.com/nexphlabs>
+ * (c) nexphant <https://github.com/nexphant>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,7 +19,8 @@ use Nexph\Core\Context\ContextStore;
  * Manages coroutine scheduling, timers, and I/O events.
  * Uses min-heap for timers instead of scanning all timers each tick.
  */
-class FiberEventLoop {
+class FiberEventLoop
+{
     private array $ready = [];
     private array $sleeping = [];
     private array $timers = [];
@@ -33,7 +34,8 @@ class FiberEventLoop {
     private array $writeStreams = [];
     private array $writeCallbacks = [];
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->timerHeap = new \SplPriorityQueue();
         $this->timerHeap->setExtractFlags(\SplPriorityQueue::EXTR_DATA);
     }
@@ -41,25 +43,28 @@ class FiberEventLoop {
     /**
      * Schedule a coroutine for execution.
      */
-    public function schedule(FiberCoroutine $coroutine): void {
+    public function schedule(FiberCoroutine $coroutine): void
+    {
         $this->ready[] = $coroutine;
     }
 
     /**
      * Schedule fiber to wake after delay.
      */
-    public function sleepFiber(Fiber $fiber, float $seconds): void {
+    public function sleepFiber(Fiber $fiber, float $seconds): void
+    {
         $this->sleeping[] = ['fiber' => $fiber, 'wake' => microtime(true) + $seconds];
     }
 
     /**
      * Schedule a timer callback.
      */
-    public function timer(float $seconds, callable $callback, bool $repeat = false): int {
+    public function timer(float $seconds, callable $callback, bool $repeat = false): int
+    {
         // Capture current context
         $context = ContextStore::instance()->current();
         $parentOwnerId = $context->ownerId();
-        
+
         // Create timer owner
         $timerOwner = class_exists('\Nexph\Runtime\Runtime') && \Nexph\Runtime\Runtime::available()
             ? \Nexph\Runtime\Runtime::owners()->open(
@@ -68,7 +73,7 @@ class FiberEventLoop {
                 ['interval' => $seconds, 'repeat' => $repeat]
             )
             : null;
-        
+
         $id = $this->nextTimerId++;
         $next = microtime(true) + $seconds;
         $this->timers[$id] = [
@@ -80,23 +85,24 @@ class FiberEventLoop {
             'owner' => $timerOwner,
         ];
         $this->timerHeap->insert($id, -$next);
-        
+
         // Track timer as resource
         if (class_exists('\Nexph\Core\Resource\ResourceRegistry') && $timerOwner) {
             \Nexph\Core\Resource\ResourceRegistry::instance()->track(
-                (object)['timer_id' => $id],
+                (object) ['timer_id' => $id],
                 'timer',
                 $timerOwner->id()
             );
         }
-        
+
         return $id;
     }
 
     /**
      * Cancel a timer.
      */
-    public function cancelTimer(int $id): void {
+    public function cancelTimer(int $id): void
+    {
         if (isset($this->timers[$id])) {
             $timer = $this->timers[$id];
             if ($timer['owner'] ?? null) {
@@ -109,7 +115,8 @@ class FiberEventLoop {
     /**
      * Register a stream for read readiness.
      */
-    public function onReadable($stream, callable $callback): void {
+    public function onReadable($stream, callable $callback): void
+    {
         $id = (int) $stream;
         $this->readStreams[$id] = $stream;
         $this->readCallbacks[$id] = $callback;
@@ -118,7 +125,8 @@ class FiberEventLoop {
     /**
      * Remove read watcher.
      */
-    public function removeReadable($stream): void {
+    public function removeReadable($stream): void
+    {
         $id = (int) $stream;
         unset($this->readStreams[$id], $this->readCallbacks[$id]);
     }
@@ -126,7 +134,8 @@ class FiberEventLoop {
     /**
      * Register a stream for write readiness.
      */
-    public function onWritable($stream, callable $callback): void {
+    public function onWritable($stream, callable $callback): void
+    {
         $id = (int) $stream;
         $this->writeStreams[$id] = $stream;
         $this->writeCallbacks[$id] = $callback;
@@ -135,7 +144,8 @@ class FiberEventLoop {
     /**
      * Remove write watcher.
      */
-    public function removeWritable($stream): void {
+    public function removeWritable($stream): void
+    {
         $id = (int) $stream;
         unset($this->writeStreams[$id], $this->writeCallbacks[$id]);
     }
@@ -143,7 +153,8 @@ class FiberEventLoop {
     /**
      * Run event loop until all work complete.
      */
-    public function run(): void {
+    public function run(): void
+    {
         if ($this->running) {
             throw new \RuntimeException('Event loop is already running');
         }
@@ -160,21 +171,24 @@ class FiberEventLoop {
     /**
      * Stop event loop.
      */
-    public function stop(): void {
+    public function stop(): void
+    {
         $this->running = false;
     }
 
     /**
      * Check if event loop is running.
      */
-    public function isRunning(): bool {
+    public function isRunning(): bool
+    {
         return $this->running;
     }
 
     /**
      * Single event loop iteration.
      */
-    private function tick(): void {
+    private function tick(): void
+    {
         $now = microtime(true);
 
         // Process timers via heap — O(log n) per expired timer
@@ -212,7 +226,7 @@ class FiberEventLoop {
                 }
             } catch (\Throwable $e) {
                 error_log("Coroutine error: " . $e->getMessage());
-                
+
                 if (class_exists('\Nexph\Core\Context\ContextStore')) {
                     $ctx = \Nexph\Core\Context\ContextStore::instance()->current();
                     $ownerId = $ctx->ownerId();
@@ -235,7 +249,8 @@ class FiberEventLoop {
         }
     }
 
-    private function processTimers(float $now): void {
+    private function processTimers(float $now): void
+    {
         while (!$this->timerHeap->isEmpty()) {
             $id = $this->timerHeap->top();
 
@@ -251,7 +266,7 @@ class FiberEventLoop {
             }
 
             $this->timerHeap->extract();
-            
+
             // Check drain state before executing timer
             if (class_exists('\Nexph\Core\Drain\DrainController')) {
                 $drainController = \Nexph\Core\Drain\DrainController::instance();
@@ -263,7 +278,7 @@ class FiberEventLoop {
                     unset($this->timers[$id]);
                     continue;
                 }
-                
+
                 // Check cancellation token
                 $token = $drainController->cancellationToken();
                 if ($token && $token->isCancelled()) {
@@ -274,7 +289,7 @@ class FiberEventLoop {
                     continue;
                 }
             }
-            
+
             // Restore context for timer callback
             $context = $timer['context'] ?? null;
             if ($context !== null) {
@@ -303,7 +318,8 @@ class FiberEventLoop {
         }
     }
 
-    private function processSleeping(float $now): void {
+    private function processSleeping(float $now): void
+    {
         $stillSleeping = [];
         foreach ($this->sleeping as $item) {
             if ($item['wake'] <= $now) {
@@ -322,7 +338,8 @@ class FiberEventLoop {
         $this->sleeping = $stillSleeping;
     }
 
-    private function pollIO(): void {
+    private function pollIO(): void
+    {
         if (empty($this->readStreams) && empty($this->writeStreams)) {
             return;
         }
@@ -360,7 +377,8 @@ class FiberEventLoop {
         }
     }
 
-    private function nextWakeTime(): ?float {
+    private function nextWakeTime(): ?float
+    {
         $next = null;
 
         foreach ($this->sleeping as $item) {
@@ -385,7 +403,8 @@ class FiberEventLoop {
     /**
      * Check if loop has pending work.
      */
-    private function hasWork(): bool {
+    private function hasWork(): bool
+    {
         return !empty($this->ready)
             || !empty($this->sleeping)
             || !empty($this->timers)

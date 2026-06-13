@@ -3,14 +3,15 @@
 /**
  * This file is part of the Nexph Framework.
  *
- * (c) Nexphlabs <https://github.com/nexphlabs>
+ * (c) nexphant <https://github.com/nexphant>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 namespace Nexph\Runtime;
 
-class MemoryMonitor {
+class MemoryMonitor
+{
     private array $samples = [];
     private int $sampleHead = 0;
     private int $maxSamples = 100;
@@ -19,7 +20,8 @@ class MemoryMonitor {
     private float $leakGrowthRate = 0.1; // 10% growth
     private ?array $lastLeak = null;
 
-    public function sample(): void {
+    public function sample(): void
+    {
         $this->samples[] = [
             'time' => microtime(true),
             'usage' => memory_get_usage(true),
@@ -34,7 +36,8 @@ class MemoryMonitor {
         }
     }
 
-    public function detectLeak(): bool {
+    public function detectLeak(): bool
+    {
         if ($this->sampleCount() < $this->leakWindowSamples) {
             return false;
         }
@@ -67,7 +70,8 @@ class MemoryMonitor {
         return false;
     }
 
-    public function getReport(): string {
+    public function getReport(): string
+    {
         if (!$this->lastLeak) {
             return 'No leak detected';
         }
@@ -81,7 +85,8 @@ class MemoryMonitor {
         );
     }
 
-    public function getStats(): array {
+    public function getStats(): array
+    {
         if (empty($this->samples)) {
             return ['current' => 0, 'peak' => 0, 'samples' => 0];
         }
@@ -95,40 +100,50 @@ class MemoryMonitor {
         ];
     }
 
-    private function calculateTrend(): string {
-        if ($this->sampleCount() < 5) return 'stable';
+    private function calculateTrend(): string
+    {
+        if ($this->sampleCount() < 5)
+            return 'stable';
         $recent = array_slice($this->activeSamples(), -5);
         $diff = end($recent)['usage'] - reset($recent)['usage'];
-        if ($diff > 100 * 1024) return 'increasing';
-        if ($diff < -100 * 1024) return 'decreasing';
+        if ($diff > 100 * 1024)
+            return 'increasing';
+        if ($diff < -100 * 1024)
+            return 'decreasing';
         return 'stable';
     }
 
-    public function setThreshold(int $bytes): self {
+    public function setThreshold(int $bytes): self
+    {
         $this->leakThresholdBytes = $bytes;
         return $this;
     }
 
-    public function setGrowthRate(float $rate): self {
+    public function setGrowthRate(float $rate): self
+    {
         $this->leakGrowthRate = $rate;
         return $this;
     }
 
-    public function reset(): void {
+    public function reset(): void
+    {
         $this->samples = [];
         $this->sampleHead = 0;
         $this->lastLeak = null;
     }
 
-    private function sampleCount(): int {
+    private function sampleCount(): int
+    {
         return count($this->samples) - $this->sampleHead;
     }
 
-    private function activeSamples(): array {
+    private function activeSamples(): array
+    {
         return $this->sampleHead === 0 ? $this->samples : array_slice($this->samples, $this->sampleHead);
     }
 
-    private function formatBytes(int $bytes): string {
+    private function formatBytes(int $bytes): string
+    {
         $units = ['B', 'KB', 'MB', 'GB'];
         $i = 0;
         while ($bytes >= 1024 && $i < count($units) - 1) {

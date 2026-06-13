@@ -3,7 +3,7 @@
 /**
  * This file is part of the Nexph Framework.
  *
- * (c) Nexphlabs <https://github.com/nexphlabs>
+ * (c) nexphant <https://github.com/nexphant>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,19 +14,22 @@ namespace Nexph\Runtime\Observability;
  * Runtime metrics collector.
  * Tracks worker health, fiber activity, queue depth, throughput, and degradation state.
  */
-class RuntimeMetrics {
+class RuntimeMetrics
+{
     private array $metrics = [];
     private float $startTime;
     private array $counters = [];
     private array $gauges = [];
     private array $timers = [];
-    
-    public function __construct() {
+
+    public function __construct()
+    {
         $this->startTime = microtime(true);
         $this->reset();
     }
-    
-    public function reset(): void {
+
+    public function reset(): void
+    {
         $this->counters = [
             'jobs_enqueued' => 0,
             'jobs_completed' => 0,
@@ -39,7 +42,7 @@ class RuntimeMetrics {
             'errors' => 0,
             'panics' => 0,
         ];
-        
+
         $this->gauges = [
             'active_workers' => 0,
             'active_fibers' => 0,
@@ -49,25 +52,28 @@ class RuntimeMetrics {
             'memory_peak' => 0,
             'loop_lag_ms' => 0,
         ];
-        
+
         $this->timers = [
             'job_duration_total' => 0.0,
             'job_duration_count' => 0,
         ];
     }
-    
-    public function incrementCounter(string $name, int $value = 1): void {
+
+    public function incrementCounter(string $name, int $value = 1): void
+    {
         if (!isset($this->counters[$name])) {
             $this->counters[$name] = 0;
         }
         $this->counters[$name] += $value;
     }
-    
-    public function setGauge(string $name, float|int $value): void {
+
+    public function setGauge(string $name, float|int $value): void
+    {
         $this->gauges[$name] = $value;
     }
-    
-    public function recordTiming(string $name, float $duration): void {
+
+    public function recordTiming(string $name, float $duration): void
+    {
         if (!isset($this->timers[$name . '_total'])) {
             $this->timers[$name . '_total'] = 0.0;
             $this->timers[$name . '_count'] = 0;
@@ -75,43 +81,51 @@ class RuntimeMetrics {
         $this->timers[$name . '_total'] += $duration;
         $this->timers[$name . '_count']++;
     }
-    
-    public function updateMemory(): void {
+
+    public function updateMemory(): void
+    {
         $this->gauges['memory_usage'] = memory_get_usage(true);
         $this->gauges['memory_peak'] = memory_get_peak_usage(true);
     }
-    
-    public function getCounter(string $name): int {
+
+    public function getCounter(string $name): int
+    {
         return $this->counters[$name] ?? 0;
     }
-    
-    public function getGauge(string $name): float|int {
+
+    public function getGauge(string $name): float|int
+    {
         return $this->gauges[$name] ?? 0;
     }
-    
-    public function getAverageTiming(string $name): float {
+
+    public function getAverageTiming(string $name): float
+    {
         $total = $this->timers[$name . '_total'] ?? 0.0;
         $count = $this->timers[$name . '_count'] ?? 0;
         return $count > 0 ? $total / $count : 0.0;
     }
-    
-    public function getUptime(): float {
+
+    public function getUptime(): float
+    {
         return microtime(true) - $this->startTime;
     }
-    
-    public function getThroughput(): float {
+
+    public function getThroughput(): float
+    {
         $uptime = $this->getUptime();
         return $uptime > 0 ? $this->counters['jobs_completed'] / $uptime : 0.0;
     }
-    
-    public function getSuccessRate(): float {
+
+    public function getSuccessRate(): float
+    {
         $total = $this->counters['jobs_completed'] + $this->counters['jobs_failed'];
         return $total > 0 ? ($this->counters['jobs_completed'] / $total) * 100 : 100.0;
     }
-    
-    public function toArray(): array {
+
+    public function toArray(): array
+    {
         $this->updateMemory();
-        
+
         return [
             'uptime' => $this->getUptime(),
             'counters' => $this->counters,
@@ -127,8 +141,9 @@ class RuntimeMetrics {
             ],
         ];
     }
-    
-    public function snapshot(): array {
+
+    public function snapshot(): array
+    {
         return $this->toArray();
     }
 }

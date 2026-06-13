@@ -3,19 +3,21 @@
 /**
  * This file is part of the Nexph Framework.
  *
- * (c) Nexphlabs <https://github.com/nexphlabs>
+ * (c) nexphant <https://github.com/nexphant>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 namespace Nexph\Runtime;
 
-class MemoryLeakDetector {
+class MemoryLeakDetector
+{
     private array $snapshots = [];
     private array $objectCounts = [];
     private array $leakSuspects = [];
 
-    public function snapshot(string $label = ''): void {
+    public function snapshot(string $label = ''): void
+    {
         $label = $label ?: 'snap_' . count($this->snapshots);
         $this->snapshots[$label] = [
             'time' => microtime(true),
@@ -25,7 +27,8 @@ class MemoryLeakDetector {
         ];
     }
 
-    public function compare(string $from, string $to): array {
+    public function compare(string $from, string $to): array
+    {
         if (!isset($this->snapshots[$from]) || !isset($this->snapshots[$to])) {
             return ['error' => 'Snapshot not found'];
         }
@@ -54,7 +57,8 @@ class MemoryLeakDetector {
         ];
     }
 
-    public function track(callable $fn, int $iterations = 10): array {
+    public function track(callable $fn, int $iterations = 10): array
+    {
         gc_collect_cycles();
         $this->snapshot('before');
 
@@ -74,13 +78,15 @@ class MemoryLeakDetector {
         return $results;
     }
 
-    private function countObjects(): array {
+    private function countObjects(): array
+    {
         $counts = [];
         foreach (get_declared_classes() as $class) {
             // Skip internal classes
             try {
                 $ref = new \ReflectionClass($class);
-                if ($ref->isInternal()) continue;
+                if ($ref->isInternal())
+                    continue;
             } catch (\Throwable $e) {
                 continue;
             }
@@ -96,7 +102,8 @@ class MemoryLeakDetector {
         return $counts;
     }
 
-    private function analyzeSuspects(array $objDiff, int $memDiff): array {
+    private function analyzeSuspects(array $objDiff, int $memDiff): array
+    {
         $suspects = [];
 
         if ($memDiff > 1024 * 1024) { // > 1MB
@@ -121,9 +128,11 @@ class MemoryLeakDetector {
         return $suspects;
     }
 
-    private function analyzeTrend(): string {
+    private function analyzeTrend(): string
+    {
         $snaps = array_values($this->snapshots);
-        if (count($snaps) < 3) return 'insufficient_data';
+        if (count($snaps) < 3)
+            return 'insufficient_data';
 
         $increasing = 0;
         for ($i = 1; $i < count($snaps); $i++) {
@@ -133,22 +142,27 @@ class MemoryLeakDetector {
         }
 
         $ratio = $increasing / (count($snaps) - 1);
-        if ($ratio > 0.8) return 'leak_likely';
-        if ($ratio > 0.5) return 'possible_leak';
+        if ($ratio > 0.8)
+            return 'leak_likely';
+        if ($ratio > 0.5)
+            return 'possible_leak';
         return 'stable';
     }
 
-    public function reset(): void {
+    public function reset(): void
+    {
         $this->snapshots = [];
         $this->objectCounts = [];
         $this->leakSuspects = [];
     }
 
-    public function getSnapshots(): array {
+    public function getSnapshots(): array
+    {
         return $this->snapshots;
     }
 
-    private function formatBytes(int $bytes): string {
+    private function formatBytes(int $bytes): string
+    {
         $sign = $bytes < 0 ? '-' : '';
         $bytes = abs($bytes);
         $units = ['B', 'KB', 'MB', 'GB'];
