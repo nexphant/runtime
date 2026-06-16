@@ -1,13 +1,13 @@
 <?php
 
-namespace nexphant\Runtime;
+namespace Nexphant\Runtime;
 
 class OptimizeLoader
 {
     private static bool $initialized = false;
     private static bool $opcacheEnabled = false;
     private static bool $apcuEnabled = false;
-    private static string $cacheKey = 'nexphant_classmap';
+    private static string $cacheKey = 'NEXPHANT_classmap';
 
     public static function init(): void
     {

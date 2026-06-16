@@ -1,6 +1,6 @@
 <?php
 
-namespace nexphant\Runtime\Adaptive;
+namespace Nexphant\Runtime\Adaptive;
 
 /**
  * Cross-worker shared load table using shmop (preferred) or sysvshm.

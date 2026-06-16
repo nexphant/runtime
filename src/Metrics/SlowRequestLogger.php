@@ -1,6 +1,6 @@
 <?php
 
-namespace nexphant\Runtime\Metrics;
+namespace Nexphant\Runtime\Metrics;
 
 class SlowRequestLogger
 {

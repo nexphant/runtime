@@ -1,6 +1,6 @@
 <?php
 
-namespace nexphant\Runtime;
+namespace Nexphant\Runtime;
 
 final class ResponseCache
 {

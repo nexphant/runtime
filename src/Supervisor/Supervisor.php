@@ -8,10 +8,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace nexphant\Runtime\Supervisor;
+namespace Nexphant\Runtime\Supervisor;
 
-use nexphant\Runtime\Runtime;
-use nexphant\Runtime\Observability\Logger;
+use Nexphant\Runtime\Runtime;
+use Nexphant\Runtime\Observability\Logger;
 
 /**
  * Lightweight worker supervisor.

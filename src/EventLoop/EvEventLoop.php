@@ -1,6 +1,6 @@
 <?php
 
-namespace nexphant\Runtime\EventLoop;
+namespace Nexphant\Runtime\EventLoop;
 
 class EvEventLoop implements EventLoopInterface
 {

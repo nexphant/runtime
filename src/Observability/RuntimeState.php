@@ -8,10 +8,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace nexphant\Runtime\Observability;
+namespace Nexphant\Runtime\Observability;
 
-use nexphant\Queue\QueueFactory;
-use nexphant\Runtime\Runtime;
+use Nexphant\Queue\QueueFactory;
+use Nexphant\Runtime\Runtime;
 
 class RuntimeState
 {

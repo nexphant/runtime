@@ -1,4 +1,4 @@
-# nexphant Runtime
+# Nexphant Runtime
 
 Runtime core for nexphant framework.
 

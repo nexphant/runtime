@@ -1,11 +1,11 @@
 <?php
 
-namespace nexphant\Runtime\Supervisor;
+namespace Nexphant\Runtime\Supervisor;
 
-use nexphant\Runtime\SharedMemory\SharedMemoryInterface;
-use nexphant\Runtime\SharedMemory\SysvSharedMemory;
-use nexphant\Runtime\SharedMemory\FileSharedMemory;
-use nexphant\Support\Extension\ExtensionDetector;
+use Nexphant\Runtime\SharedMemory\SharedMemoryInterface;
+use Nexphant\Runtime\SharedMemory\SysvSharedMemory;
+use Nexphant\Runtime\SharedMemory\FileSharedMemory;
+use Nexphant\Support\Extension\ExtensionDetector;
 
 class WorkerHealthTable
 {
@@ -22,7 +22,7 @@ class WorkerHealthTable
         if (ExtensionDetector::has('sysvshm')) {
             return new SysvSharedMemory(ftok(__FILE__, 'w'));
         }
-        return new FileSharedMemory(sys_get_temp_dir() . '/nexphant_worker_health.dat');
+        return new FileSharedMemory(sys_get_temp_dir() . '/NEXPHANT_worker_health.dat');
     }
 
     public function update(int $workerId, array $status): void

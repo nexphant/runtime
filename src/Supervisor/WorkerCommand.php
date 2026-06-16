@@ -1,6 +1,6 @@
 <?php
 
-namespace nexphant\Runtime\Supervisor;
+namespace Nexphant\Runtime\Supervisor;
 
 enum WorkerCommand: int
 {

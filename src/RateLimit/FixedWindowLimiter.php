@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace nexphant\Runtime\RateLimit;
+namespace Nexphant\Runtime\RateLimit;
 
 final class FixedWindowLimiter implements RateLimiter
 {

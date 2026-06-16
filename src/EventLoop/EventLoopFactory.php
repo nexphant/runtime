@@ -1,14 +1,14 @@
 <?php
 
-namespace nexphant\Runtime\EventLoop;
+namespace Nexphant\Runtime\EventLoop;
 
-use nexphant\Support\Extension\ExtensionDetector;
+use Nexphant\Support\Extension\ExtensionDetector;
 
 class EventLoopFactory
 {
     public static function create(?string $preferred = null): EventLoopInterface
     {
-        $override = getenv('nexphant_LOOP') ?: $preferred;
+        $override = getenv('NEXPHANT_LOOP') ?: $preferred;
         
         if ($override === 'select') {
             return new SelectEventLoop();

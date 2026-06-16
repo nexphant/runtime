@@ -1,6 +1,6 @@
 <?php
 
-namespace nexphant\Runtime\Adaptive;
+namespace Nexphant\Runtime\Adaptive;
 
 /**
  * Adaptive pressure score: 0.0 (idle) → 1.0 (overloaded).

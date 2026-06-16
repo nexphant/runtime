@@ -1,8 +1,8 @@
 <?php
 
-namespace nexphant\Runtime\IPC;
+namespace Nexphant\Runtime\IPC;
 
-use nexphant\Support\Extension\ExtensionDetector;
+use Nexphant\Support\Extension\ExtensionDetector;
 
 class SupervisorCommandBus
 {

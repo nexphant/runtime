@@ -1,8 +1,8 @@
 <?php
 
-namespace nexphant\Runtime\SharedMemory;
+namespace Nexphant\Runtime\SharedMemory;
 
-use nexphant\Support\Extension\ExtensionDetector;
+use Nexphant\Support\Extension\ExtensionDetector;
 
 class WorkerHealthTable
 {

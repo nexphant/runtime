@@ -1,6 +1,6 @@
 <?php
 
-namespace nexphant\Runtime\IPC;
+namespace Nexphant\Runtime\IPC;
 
 interface MessageBusInterface
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace nexphant\Runtime\Sync;
+namespace Nexphant\Runtime\Sync;
 
 class FileSemaphore implements SemaphoreInterface
 {

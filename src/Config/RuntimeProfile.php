@@ -1,6 +1,6 @@
 <?php
 
-namespace nexphant\Runtime\Config;
+namespace Nexphant\Runtime\Config;
 
 final class RuntimeProfile
 {

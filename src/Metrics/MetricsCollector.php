@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace nexphant\Runtime\Metrics;
+namespace Nexphant\Runtime\Metrics;
 
 /**
  * Runtime metrics collector
@@ -107,16 +107,16 @@ final class MetricsCollector
     
     private function mergeRuntimeLabels(array $labels): array
     {
-        if (!class_exists('\nexphant\Runtime\Runtime')) {
+        if (!class_exists('\Nexphant\Runtime\Runtime')) {
             return $labels;
         }
         
         try {
-            if (!\nexphant\Runtime\Runtime::available()) {
+            if (!\Nexphant\Runtime\Runtime::available()) {
                 return $labels;
             }
             
-            $ctx = \nexphant\Runtime\Runtime::context();
+            $ctx = \Nexphant\Runtime\Runtime::context();
             
             // Only add safe, low-cardinality labels
             if ($ctx->ownerType() && !isset($labels['owner_type'])) {

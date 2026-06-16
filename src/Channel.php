@@ -8,11 +8,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace nexphant\Runtime;
+namespace Nexphant\Runtime;
 
 use Fiber;
-use nexphant\Core\Cancellation\CancellationToken;
-use nexphant\Core\Cancellation\CancelledException;
+use Nexphant\Core\Cancellation\CancellationToken;
+use Nexphant\Core\Cancellation\CancelledException;
 
 /**
  * Lightweight channel for coroutine communication.
@@ -37,12 +37,12 @@ class Channel
         $this->capacity = max(0, $capacity);
 
         // Track channel as resource
-        if (class_exists('\nexphant\Core\Resource\ResourceRegistry') && class_exists('\nexphant\Runtime\Runtime') && \nexphant\Runtime\Runtime::available()) {
+        if (class_exists('\Nexphant\Core\Resource\ResourceRegistry') && class_exists('\Nexphant\Runtime\Runtime') && \Nexphant\Runtime\Runtime::available()) {
             $this->resourceId = bin2hex(random_bytes(16));
-            \nexphant\Core\Resource\ResourceRegistry::instance()->track(
+            \Nexphant\Core\Resource\ResourceRegistry::instance()->track(
                 $this,
                 'channel',
-                \nexphant\Runtime\Runtime::context()->ownerId()
+                \Nexphant\Runtime\Runtime::context()->ownerId()
             );
         }
     }
@@ -228,8 +228,8 @@ class Channel
         $this->recvHead = 0;
 
         // Release from resource registry
-        if ($this->resourceId && class_exists('\nexphant\Core\Resource\ResourceRegistry')) {
-            \nexphant\Core\Resource\ResourceRegistry::instance()->release($this->resourceId);
+        if ($this->resourceId && class_exists('\Nexphant\Core\Resource\ResourceRegistry')) {
+            \Nexphant\Core\Resource\ResourceRegistry::instance()->release($this->resourceId);
         }
     }
 

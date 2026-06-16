@@ -1,6 +1,6 @@
 <?php
 
-namespace nexphant\Runtime;
+namespace Nexphant\Runtime;
 
 class OptimizeCompiler
 {
@@ -120,11 +120,11 @@ class OptimizeCompiler
     private function compilePreload(): void
     {
         $this->writeArray('preload.php', [
-            \nexphant\Runtime\Runtime::class,
-            \nexphant\Runtime\Channel::class,
-            \nexphant\Lifecycle\Lifecycle::class,
-            \nexphant\Server\HttpServer::class,
-            \nexphant\Server\Router::class,
+            \Nexphant\Runtime\Runtime::class,
+            \Nexphant\Runtime\Channel::class,
+            \Nexphant\Lifecycle\Lifecycle::class,
+            \Nexphant\Server\HttpServer::class,
+            \Nexphant\Server\Router::class,
         ]);
     }
 
@@ -152,8 +152,8 @@ if (!$opcache) {
     if (is_file($vendor)) {
         require_once $vendor;
     }
-    if (class_exists(\nexphant\Runtime\CompiledHotPath::class)) {
-        \nexphant\Runtime\CompiledHotPath::load($compiled);
+    if (class_exists(\Nexphant\Runtime\CompiledHotPath::class)) {
+        \Nexphant\Runtime\CompiledHotPath::load($compiled);
     }
     return [
         'mode' => 'composer',
@@ -208,8 +208,8 @@ foreach ($files as $file) {
     require_once $file;
 }
 
-if (class_exists(\nexphant\Runtime\CompiledHotPath::class)) {
-    \nexphant\Runtime\CompiledHotPath::load($compiled);
+if (class_exists(\Nexphant\Runtime\CompiledHotPath::class)) {
+    \Nexphant\Runtime\CompiledHotPath::load($compiled);
 }
 
 return [

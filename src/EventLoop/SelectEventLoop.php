@@ -1,8 +1,8 @@
 <?php
 
-namespace nexphant\Runtime\EventLoop;
+namespace Nexphant\Runtime\EventLoop;
 
-use nexphant\Core\Context\ContextStore;
+use Nexphant\Core\Context\ContextStore;
 
 class SelectEventLoop implements EventLoopInterface
 {
@@ -97,10 +97,10 @@ class SelectEventLoop implements EventLoopInterface
         $context = ContextStore::instance()->current();
         $parentOwnerId = $context->ownerId();
         
-        $timerOwner = class_exists('\nexphant\Runtime\Runtime') && \nexphant\Runtime\Runtime::available()
-            ? \nexphant\Runtime\Runtime::owners()->open(
-                \nexphant\Core\Ownership\OwnerType::TIMER,
-                $parentOwnerId ? \nexphant\Runtime\Runtime::owners()->get($parentOwnerId)?->id() : null,
+        $timerOwner = class_exists('\Nexphant\Runtime\Runtime') && \Nexphant\Runtime\Runtime::available()
+            ? \Nexphant\Runtime\Runtime::owners()->open(
+                \Nexphant\Core\Ownership\OwnerType::TIMER,
+                $parentOwnerId ? \Nexphant\Runtime\Runtime::owners()->get($parentOwnerId)?->id() : null,
                 ['interval' => $seconds, 'repeat' => $repeat]
             )
             : null;
@@ -117,8 +117,8 @@ class SelectEventLoop implements EventLoopInterface
         ];
         $this->timerHeap->insert($id, -$next);
         
-        if (class_exists('\nexphant\Core\Resource\ResourceRegistry') && $timerOwner) {
-            \nexphant\Core\Resource\ResourceRegistry::instance()->track(
+        if (class_exists('\Nexphant\Core\Resource\ResourceRegistry') && $timerOwner) {
+            \Nexphant\Core\Resource\ResourceRegistry::instance()->track(
                 (object)['timer_id' => $id],
                 'timer',
                 $timerOwner->id()
@@ -200,8 +200,8 @@ class SelectEventLoop implements EventLoopInterface
 
             $this->timerHeap->extract();
             
-            if (class_exists('\nexphant\Core\Drain\DrainController')) {
-                $drainController = \nexphant\Core\Drain\DrainController::instance();
+            if (class_exists('\Nexphant\Core\Drain\DrainController')) {
+                $drainController = \Nexphant\Core\Drain\DrainController::instance();
                 if (!$drainController->isAccepting()) {
                     if ($timer['owner'] ?? null) {
                         $timer['owner']->close('timer_skipped_drain');

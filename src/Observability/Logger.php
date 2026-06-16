@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace nexphant\Runtime\Observability;
+namespace Nexphant\Runtime\Observability;
 
 /**
  * Structured runtime logger.
@@ -104,16 +104,16 @@ class Logger
 
     private function getRuntimeContext(): array
     {
-        if (!class_exists('\nexphant\Runtime\Runtime')) {
+        if (!class_exists('\Nexphant\Runtime\Runtime')) {
             return [];
         }
 
         try {
-            if (!\nexphant\Runtime\Runtime::available()) {
+            if (!\Nexphant\Runtime\Runtime::available()) {
                 return [];
             }
 
-            $ctx = \nexphant\Runtime\Runtime::context();
+            $ctx = \Nexphant\Runtime\Runtime::context();
             $result = [];
 
             if ($ctx->traceId()) {

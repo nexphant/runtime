@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace nexphant\Runtime\Metrics;
+namespace Nexphant\Runtime\Metrics;
 
-use nexphant\Core\Ownership\OwnerRegistry;
-use nexphant\Core\Resource\ResourceRegistry;
+use Nexphant\Core\Ownership\OwnerRegistry;
+use Nexphant\Core\Resource\ResourceRegistry;
 
 /**
  * Runtime metrics tracker for tasks, fibers, and resources
@@ -73,8 +73,8 @@ final class RuntimeMetrics
     {
         $this->collector->gauge('active_fibers', count($this->taskTimings));
         
-        if (class_exists('\nexphant\Runtime\Fiber\FiberRegistry')) {
-            $stats = \nexphant\Runtime\Fiber\FiberRegistry::instance()->stats();
+        if (class_exists('\Nexphant\Runtime\Fiber\FiberRegistry')) {
+            $stats = \Nexphant\Runtime\Fiber\FiberRegistry::instance()->stats();
             $this->collector->gauge('suspended_fibers', $stats['suspended']);
             $this->collector->gauge('fibers_running', $stats['running']);
             $this->collector->gauge('fibers_completed', $stats['completed']);

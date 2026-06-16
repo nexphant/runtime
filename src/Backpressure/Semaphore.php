@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace nexphant\Runtime\Backpressure;
+namespace Nexphant\Runtime\Backpressure;
 
-use nexphant\Core\Cancellation\CancellationToken;
-use nexphant\Core\Cancellation\CancelledException;
-use nexphant\Core\Cancellation\Deadline;
-use nexphant\Core\Cancellation\DeadlineExceededException;
-use nexphant\Core\Ownership\OwnerId;
+use Nexphant\Core\Cancellation\CancellationToken;
+use Nexphant\Core\Cancellation\CancelledException;
+use Nexphant\Core\Cancellation\Deadline;
+use Nexphant\Core\Cancellation\DeadlineExceededException;
+use Nexphant\Core\Ownership\OwnerId;
 
 /**
  * Counting semaphore for resource limiting

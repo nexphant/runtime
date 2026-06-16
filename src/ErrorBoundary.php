@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace nexphant\Runtime;
+namespace Nexphant\Runtime;
 
-use nexphant\Core\Ownership\OwnerType;
+use Nexphant\Core\Ownership\OwnerType;
 
 final class ErrorBoundary
 {

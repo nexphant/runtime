@@ -1,6 +1,6 @@
 <?php
 
-namespace nexphant\Runtime\SharedMemory;
+namespace Nexphant\Runtime\SharedMemory;
 
 interface SharedMemoryInterface
 {

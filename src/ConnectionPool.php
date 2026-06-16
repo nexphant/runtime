@@ -1,9 +1,9 @@
 <?php
 
-namespace nexphant\Runtime;
+namespace Nexphant\Runtime;
 
-use nexphant\Database\DB;
-use nexphant\Database\Drivers\DriverInterface;
+use Nexphant\Database\DB;
+use Nexphant\Database\Drivers\DriverInterface;
 
 class ConnectionPool
 {

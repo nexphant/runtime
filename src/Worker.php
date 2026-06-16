@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace nexphant\Runtime;
+namespace Nexphant\Runtime;
 
 /**
  * Long-running worker process manager.
@@ -45,7 +45,7 @@ class Worker
         echo "[Worker] Starting...\n";
 
         while (!self::$shouldStop) {
-            $drain = \nexphant\Core\Drain\DrainController::instance();
+            $drain = \Nexphant\Core\Drain\DrainController::instance();
 
             if ($drain->isDraining() || $drain->isStopped()) {
                 echo "[Worker] Drain active, waiting...\n";
