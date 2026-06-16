@@ -1,17 +1,17 @@
 <?php
 
 /**
- * This file is part of the Nexph Framework.
+ * This file is part of the nexphant Framework.
  *
  * (c) nexphant <https://github.com/nexphant>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Nexph\Runtime\Supervisor;
+namespace nexphant\Runtime\Supervisor;
 
-use Nexph\Runtime\Runtime;
-use Nexph\Runtime\Observability\Logger;
+use nexphant\Runtime\Runtime;
+use nexphant\Runtime\Observability\Logger;
 
 /**
  * Lightweight worker supervisor.

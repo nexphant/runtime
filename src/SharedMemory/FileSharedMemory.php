@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime\SharedMemory;
+namespace nexphant\Runtime\SharedMemory;
 
 class FileSharedMemory implements SharedMemoryInterface
 {
@@ -9,7 +9,7 @@ class FileSharedMemory implements SharedMemoryInterface
 
     public function __construct(string $name, int $size = 65536)
     {
-        $this->file = sys_get_temp_dir() . '/nexph-shm-' . md5($name) . '.dat';
+        $this->file = sys_get_temp_dir() . '/nexphant-shm-' . md5($name) . '.dat';
         
         if (!file_exists($this->file)) {
             file_put_contents($this->file, str_repeat("\0", $size));

@@ -1,32 +1,32 @@
 <?php
 
 /**
- * This file is part of the Nexph Framework.
+ * This file is part of the nexphant Framework.
  *
  * (c) nexphant <https://github.com/nexphant>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Nexph\Runtime;
+namespace nexphant\Runtime;
 
 use Fiber;
-use Nexph\Runtime\Backpressure\BoundedExecutor;
-use Nexph\Runtime\Backpressure\Semaphore;
-use Nexph\Core\Cancellation\CancellationSource;
-use Nexph\Core\Cancellation\CancelledException;
-use Nexph\Core\Cancellation\Deadline;
-use Nexph\Core\Cancellation\CancellationToken;
-use Nexph\Core\Context\ContextStore;
-use Nexph\Core\Context\RuntimeContext;
-use Nexph\Runtime\Metrics\RuntimeMetrics;
-use Nexph\Runtime\Observability\LeakSnapshot;
-use Nexph\Core\Ownership\OwnerRegistry;
-use Nexph\Core\Ownership\OwnerType;
-use Nexph\Core\Resource\ResourceRegistry;
+use nexphant\Runtime\Backpressure\BoundedExecutor;
+use nexphant\Runtime\Backpressure\Semaphore;
+use nexphant\Core\Cancellation\CancellationSource;
+use nexphant\Core\Cancellation\CancelledException;
+use nexphant\Core\Cancellation\Deadline;
+use nexphant\Core\Cancellation\CancellationToken;
+use nexphant\Core\Context\ContextStore;
+use nexphant\Core\Context\RuntimeContext;
+use nexphant\Runtime\Metrics\RuntimeMetrics;
+use nexphant\Runtime\Observability\LeakSnapshot;
+use nexphant\Core\Ownership\OwnerRegistry;
+use nexphant\Core\Ownership\OwnerType;
+use nexphant\Core\Resource\ResourceRegistry;
 
 /**
- * Adaptive stateful runtime layer for Nexph.
+ * Adaptive stateful runtime layer for nexphant.
  * 
  * Enables async/stateful features only when environment supports them.
  * Falls back to synchronous execution on shared hosting/FPM.
@@ -119,14 +119,14 @@ class Runtime
     /**
      * Detached fiber with explicit owner
      */
-    public static function detached(callable $fn, \Nexph\Lifecycle\Owner $owner): void
+    public static function detached(callable $fn, \nexphant\Lifecycle\Owner $owner): void
     {
-        if ($owner instanceof \Nexph\Lifecycle\RequestOwner || $owner instanceof \Nexph\Lifecycle\ChildFiberOwner) {
+        if ($owner instanceof \nexphant\Lifecycle\RequestOwner || $owner instanceof \nexphant\Lifecycle\ChildFiberOwner) {
             throw new \InvalidArgumentException('Detached fiber requires explicit non-request owner');
         }
 
         if (!self::available()) {
-            $childCtx = new \Nexph\Lifecycle\ChildFiberOwner($owner instanceof \Nexph\Lifecycle\OwnerScope ? $owner : null);
+            $childCtx = new \nexphant\Lifecycle\ChildFiberOwner($owner instanceof \nexphant\Lifecycle\OwnerScope ? $owner : null);
             $owner->child($childCtx);
             try {
                 $fn($childCtx);
@@ -137,7 +137,7 @@ class Runtime
         }
 
         $fiber = new \Fiber(function () use ($fn, $owner) {
-            $childCtx = new \Nexph\Lifecycle\ChildFiberOwner($owner instanceof \Nexph\Lifecycle\OwnerScope ? $owner : null);
+            $childCtx = new \nexphant\Lifecycle\ChildFiberOwner($owner instanceof \nexphant\Lifecycle\OwnerScope ? $owner : null);
             $owner->child($childCtx);
             try {
                 $fn($childCtx);
@@ -152,11 +152,11 @@ class Runtime
     /**
      * Get queue runtime
      */
-    public static function queue(string $name = 'default'): \Nexph\Queue\QueueRuntime
+    public static function queue(string $name = 'default'): \nexphant\Queue\QueueRuntime
     {
         static $queues = [];
         if (!isset($queues[$name])) {
-            $queues[$name] = new \Nexph\Queue\QueueRuntime();
+            $queues[$name] = new \nexphant\Queue\QueueRuntime();
         }
         return $queues[$name];
     }
@@ -164,11 +164,11 @@ class Runtime
     /**
      * Get scheduler runtime
      */
-    public static function schedule(): \Nexph\Scheduler\SchedulerRuntime
+    public static function schedule(): \nexphant\Scheduler\SchedulerRuntime
     {
         static $scheduler = null;
         if ($scheduler === null) {
-            $scheduler = new \Nexph\Scheduler\SchedulerRuntime();
+            $scheduler = new \nexphant\Scheduler\SchedulerRuntime();
         }
         return $scheduler;
     }
@@ -359,9 +359,9 @@ class Runtime
     /**
      * Get drain controller.
      */
-    public static function drain(): \Nexph\Core\Drain\DrainController
+    public static function drain(): \nexphant\Core\Drain\DrainController
     {
-        return \Nexph\Core\Drain\DrainController::instance();
+        return \nexphant\Core\Drain\DrainController::instance();
     }
 
     /**

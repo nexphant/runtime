@@ -1,8 +1,8 @@
 <?php
 
-namespace Nexph\Runtime\SharedMemory;
+namespace nexphant\Runtime\SharedMemory;
 
-use Nexph\Support\Extension\ExtensionDetector;
+use nexphant\Support\Extension\ExtensionDetector;
 
 class WorkerHealthTable
 {
@@ -23,7 +23,7 @@ class WorkerHealthTable
         if (ExtensionDetector::has('shmop')) {
             return new ShmopSharedMemory(ftok(__FILE__, 'w'), self::MAX_WORKERS * self::ENTRY_SIZE);
         }
-        return new FileSharedMemory('/tmp/nexph-workers.shm', self::MAX_WORKERS * self::ENTRY_SIZE);
+        return new FileSharedMemory('/tmp/nexphant-workers.shm', self::MAX_WORKERS * self::ENTRY_SIZE);
     }
 
     public function updateWorker(int $workerId, array $data): void

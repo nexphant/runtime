@@ -1,8 +1,8 @@
 <?php
 
-namespace Nexph\Runtime\IPC;
+namespace nexphant\Runtime\IPC;
 
-use Nexph\Support\Extension\ExtensionDetector;
+use nexphant\Support\Extension\ExtensionDetector;
 
 class SupervisorCommandBus
 {
@@ -18,7 +18,7 @@ class SupervisorCommandBus
         if (ExtensionDetector::has('sysvmsg')) {
             return new SysvMessageBus(ftok(__FILE__, 's'));
         }
-        return new FileMessageBus('/tmp/nexph-supervisor.queue');
+        return new FileMessageBus('/tmp/nexphant-supervisor.queue');
     }
 
     public function sendCommand(string $command, array $data = []): void

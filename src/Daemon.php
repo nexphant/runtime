@@ -1,14 +1,14 @@
 <?php
 
 /**
- * This file is part of the Nexph Framework.
+ * This file is part of the nexphant Framework.
  *
  * (c) nexphant <https://github.com/nexphant>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Nexph\Runtime;
+namespace nexphant\Runtime;
 
 class Daemon
 {
@@ -19,7 +19,7 @@ class Daemon
     private int $cycleCount = 0;
     private MemoryMonitor $memoryMonitor;
 
-    public function __construct(string $name = 'nexph')
+    public function __construct(string $name = 'nexphant')
     {
         $this->startTime = time();
         $this->pidFile = sys_get_temp_dir() . "/{$name}.pid";

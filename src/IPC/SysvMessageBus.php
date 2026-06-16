@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime\IPC;
+namespace nexphant\Runtime\IPC;
 
 class SysvMessageBus implements MessageBusInterface
 {

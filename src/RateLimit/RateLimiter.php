@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexph\Runtime\RateLimit;
+namespace nexphant\Runtime\RateLimit;
 
 interface RateLimiter
 {

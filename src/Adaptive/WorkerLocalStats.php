@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime\Adaptive;
+namespace nexphant\Runtime\Adaptive;
 
 /**
  * Lightweight per-worker runtime stats.

@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime;
+namespace nexphant\Runtime;
 
 final class JsonSerializer
 {
@@ -41,7 +41,7 @@ final class JsonSerializer
     {
         $body = self::encode($data);
         $headers['Content-Type'] = $headers['Content-Type'] ?? 'application/json';
-        $headers['Server'] = $headers['Server'] ?? 'Nexph/1.0';
+        $headers['Server'] = $headers['Server'] ?? 'nexphant/1.0';
         $headers['Connection'] = $headers['Connection'] ?? ($keepAlive ? 'keep-alive' : 'close');
         $headers['Content-Length'] = (string) strlen($body);
 

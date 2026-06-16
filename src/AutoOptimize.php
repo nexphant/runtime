@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime;
+namespace nexphant\Runtime;
 
 class AutoOptimize
 {
@@ -25,12 +25,12 @@ class AutoOptimize
             $this->manifest->save($files);
         }
         
-        CompiledHotPath::load($this->storagePath . '/nexph/compiled');
+        CompiledHotPath::load($this->storagePath . '/nexphant/compiled');
     }
 
     public function clear(): void
     {
-        $compiled = $this->storagePath . '/nexph/compiled';
+        $compiled = $this->storagePath . '/nexphant/compiled';
         
         if (is_dir($compiled)) {
             foreach (glob("$compiled/*.php") ?: [] as $file) {

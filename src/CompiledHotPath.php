@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime;
+namespace nexphant\Runtime;
 
 class CompiledHotPath
 {

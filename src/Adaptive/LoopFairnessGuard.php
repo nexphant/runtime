@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime\Adaptive;
+namespace nexphant\Runtime\Adaptive;
 
 /**
  * Per-tick fairness counters for connection read/write operations.

@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime\Config;
+namespace nexphant\Runtime\Config;
 
 class RuntimeConfigResolver
 {
@@ -118,8 +118,8 @@ class RuntimeConfigResolver
 
         $preset = $profiles[$mode] ?? $profiles['balanced'];
         
-        $eventLoop = $userConfig['event_loop'] ?? getenv('NEXPH_LOOP') ?: 'auto';
-        $socketDriver = $userConfig['socket_driver'] ?? getenv('NEXPH_SOCKET') ?: 'auto';
+        $eventLoop = $userConfig['event_loop'] ?? getenv('nexphant_LOOP') ?: 'auto';
+        $socketDriver = $userConfig['socket_driver'] ?? getenv('nexphant_SOCKET') ?: 'auto';
         
         if ($eventLoop === 'auto') $eventLoop = self::autoEventLoop();
         if ($socketDriver === 'auto') $socketDriver = self::autoSocketDriver();

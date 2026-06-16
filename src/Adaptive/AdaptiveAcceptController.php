@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime\Adaptive;
+namespace nexphant\Runtime\Adaptive;
 
 /**
  * Dynamically adjusts max accepts per tick based on runtime pressure.

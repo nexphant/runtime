@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime\EventLoop;
+namespace nexphant\Runtime\EventLoop;
 
 use Event;
 use EventBase;

@@ -1,12 +1,12 @@
 <?php
 
-namespace Nexph\Runtime;
+namespace nexphant\Runtime;
 
 final class RuntimeCache
 {
     private static bool $configured = false;
     private static bool $shared = false;
-    private static string $prefix = 'nexph:runtime:';
+    private static string $prefix = 'nexphant:runtime:';
     private static int $maxEntries = 8192;
     private static array $store = [];
     private static array $order = [];

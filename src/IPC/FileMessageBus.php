@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime\IPC;
+namespace nexphant\Runtime\IPC;
 
 class FileMessageBus implements MessageBusInterface
 {
@@ -8,7 +8,7 @@ class FileMessageBus implements MessageBusInterface
 
     public function __construct(string $name)
     {
-        $this->dir = sys_get_temp_dir() . '/nexph-mq-' . md5($name);
+        $this->dir = sys_get_temp_dir() . '/nexphant-mq-' . md5($name);
         
         if (!is_dir($this->dir)) {
             mkdir($this->dir, 0777, true);

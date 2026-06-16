@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime;
+namespace nexphant\Runtime;
 
 class OptimizeCompiler
 {
@@ -10,7 +10,7 @@ class OptimizeCompiler
 
     public function __construct(string $storagePath, ?string $basePath = null)
     {
-        $this->compiledPath = $storagePath . '/nexph/compiled';
+        $this->compiledPath = $storagePath . '/nexphant/compiled';
         $this->basePath = $basePath ?? getcwd();
     }
 
@@ -120,11 +120,11 @@ class OptimizeCompiler
     private function compilePreload(): void
     {
         $this->writeArray('preload.php', [
-            \Nexph\Runtime\Runtime::class,
-            \Nexph\Runtime\Channel::class,
-            \Nexph\Lifecycle\Lifecycle::class,
-            \Nexph\Server\HttpServer::class,
-            \Nexph\Server\Router::class,
+            \nexphant\Runtime\Runtime::class,
+            \nexphant\Runtime\Channel::class,
+            \nexphant\Lifecycle\Lifecycle::class,
+            \nexphant\Server\HttpServer::class,
+            \nexphant\Server\Router::class,
         ]);
     }
 
@@ -152,8 +152,8 @@ if (!$opcache) {
     if (is_file($vendor)) {
         require_once $vendor;
     }
-    if (class_exists(\Nexph\Runtime\CompiledHotPath::class)) {
-        \Nexph\Runtime\CompiledHotPath::load($compiled);
+    if (class_exists(\nexphant\Runtime\CompiledHotPath::class)) {
+        \nexphant\Runtime\CompiledHotPath::load($compiled);
     }
     return [
         'mode' => 'composer',
@@ -208,8 +208,8 @@ foreach ($files as $file) {
     require_once $file;
 }
 
-if (class_exists(\Nexph\Runtime\CompiledHotPath::class)) {
-    \Nexph\Runtime\CompiledHotPath::load($compiled);
+if (class_exists(\nexphant\Runtime\CompiledHotPath::class)) {
+    \nexphant\Runtime\CompiledHotPath::load($compiled);
 }
 
 return [

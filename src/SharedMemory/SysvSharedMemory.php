@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime\SharedMemory;
+namespace nexphant\Runtime\SharedMemory;
 
 class SysvSharedMemory implements SharedMemoryInterface
 {

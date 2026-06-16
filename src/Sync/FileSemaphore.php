@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime\Sync;
+namespace nexphant\Runtime\Sync;
 
 class FileSemaphore implements SemaphoreInterface
 {
@@ -10,7 +10,7 @@ class FileSemaphore implements SemaphoreInterface
 
     public function __construct(string $name)
     {
-        $this->lockFile = sys_get_temp_dir() . '/nexph-sem-' . md5($name) . '.lock';
+        $this->lockFile = sys_get_temp_dir() . '/nexphant-sem-' . md5($name) . '.lock';
     }
 
     public function acquire(float $timeout = 0): bool

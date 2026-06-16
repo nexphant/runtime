@@ -1,14 +1,14 @@
 <?php
 
 /**
- * This file is part of the Nexph Framework.
+ * This file is part of the nexphant Framework.
  *
  * (c) nexphant <https://github.com/nexphant>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Nexph\Runtime\Observability;
+namespace nexphant\Runtime\Observability;
 
 /**
  * Structured runtime logger.
@@ -104,16 +104,16 @@ class Logger
 
     private function getRuntimeContext(): array
     {
-        if (!class_exists('\Nexph\Runtime\Runtime')) {
+        if (!class_exists('\nexphant\Runtime\Runtime')) {
             return [];
         }
 
         try {
-            if (!\Nexph\Runtime\Runtime::available()) {
+            if (!\nexphant\Runtime\Runtime::available()) {
                 return [];
             }
 
-            $ctx = \Nexph\Runtime\Runtime::context();
+            $ctx = \nexphant\Runtime\Runtime::context();
             $result = [];
 
             if ($ctx->traceId()) {

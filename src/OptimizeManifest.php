@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime;
+namespace nexphant\Runtime;
 
 class OptimizeManifest
 {
@@ -9,7 +9,7 @@ class OptimizeManifest
 
     public function __construct(string $storagePath)
     {
-        $this->manifestPath = $storagePath . '/nexph/compiled/manifest.php';
+        $this->manifestPath = $storagePath . '/nexphant/compiled/manifest.php';
     }
 
     public function load(): void

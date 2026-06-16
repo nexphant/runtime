@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Nexph\Runtime\RateLimit;
+namespace nexphant\Runtime\RateLimit;
 
-use Nexph\Runtime\Runtime;
+use nexphant\Runtime\Runtime;
 
 final class PerOwnerLimiter implements RateLimiter
 {
@@ -40,7 +40,7 @@ final class PerOwnerLimiter implements RateLimiter
 
     private function scopeKey(string $key): string
     {
-        if (class_exists('\\Nexph\\Runtime\\Runtime') && Runtime::available()) {
+        if (class_exists('\\nexphant\\Runtime\\Runtime') && Runtime::available()) {
             $ownerId = Runtime::context()->ownerId();
             if ($ownerId) {
                 return $ownerId->toString() . ':' . $key;

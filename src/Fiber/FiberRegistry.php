@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Nexph\Runtime\Fiber;
+namespace nexphant\Runtime\Fiber;
 
-use Nexph\Core\Ownership\OwnerId;
-use Nexph\Core\Context\RuntimeContext;
+use nexphant\Core\Ownership\OwnerId;
+use nexphant\Core\Context\RuntimeContext;
 
 final class FiberRegistry
 {

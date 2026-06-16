@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Nexph\Runtime\Doctor;
+namespace nexphant\Runtime\Doctor;
 
-use Nexph\Runtime\Runtime;
-use Nexph\Runtime\Fiber\FiberRegistry;
-use Nexph\Core\Drain\DrainController;
+use nexphant\Runtime\Runtime;
+use nexphant\Runtime\Fiber\FiberRegistry;
+use nexphant\Core\Drain\DrainController;
 
 final class RuntimeDoctor
 {
@@ -83,11 +83,11 @@ final class RuntimeDoctor
     
     private function checkExecutors(): array
     {
-        if (!class_exists('\Nexph\Runtime\Backpressure\ExecutorRegistry')) {
+        if (!class_exists('\nexphant\Runtime\Backpressure\ExecutorRegistry')) {
             return [];
         }
         
-        return \Nexph\Runtime\Backpressure\ExecutorRegistry::instance()->checkStuck();
+        return \nexphant\Runtime\Backpressure\ExecutorRegistry::instance()->checkStuck();
     }
     
     private function checkMissingExtensions(): array

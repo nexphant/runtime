@@ -1,17 +1,17 @@
 <?php
 
 /**
- * This file is part of the Nexph Framework.
+ * This file is part of the nexphant Framework.
  *
  * (c) nexphant <https://github.com/nexphant>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Nexph\Runtime;
+namespace nexphant\Runtime;
 
 use Fiber;
-use Nexph\Core\Context\ContextStore;
+use nexphant\Core\Context\ContextStore;
 
 /**
  * Lightweight cooperative event loop.
@@ -66,10 +66,10 @@ class FiberEventLoop
         $parentOwnerId = $context->ownerId();
 
         // Create timer owner
-        $timerOwner = class_exists('\Nexph\Runtime\Runtime') && \Nexph\Runtime\Runtime::available()
-            ? \Nexph\Runtime\Runtime::owners()->open(
-                \Nexph\Core\Ownership\OwnerType::TIMER,
-                $parentOwnerId ? \Nexph\Runtime\Runtime::owners()->get($parentOwnerId)?->id() : null,
+        $timerOwner = class_exists('\nexphant\Runtime\Runtime') && \nexphant\Runtime\Runtime::available()
+            ? \nexphant\Runtime\Runtime::owners()->open(
+                \nexphant\Core\Ownership\OwnerType::TIMER,
+                $parentOwnerId ? \nexphant\Runtime\Runtime::owners()->get($parentOwnerId)?->id() : null,
                 ['interval' => $seconds, 'repeat' => $repeat]
             )
             : null;
@@ -87,8 +87,8 @@ class FiberEventLoop
         $this->timerHeap->insert($id, -$next);
 
         // Track timer as resource
-        if (class_exists('\Nexph\Core\Resource\ResourceRegistry') && $timerOwner) {
-            \Nexph\Core\Resource\ResourceRegistry::instance()->track(
+        if (class_exists('\nexphant\Core\Resource\ResourceRegistry') && $timerOwner) {
+            \nexphant\Core\Resource\ResourceRegistry::instance()->track(
                 (object) ['timer_id' => $id],
                 'timer',
                 $timerOwner->id()
@@ -227,11 +227,11 @@ class FiberEventLoop
             } catch (\Throwable $e) {
                 error_log("Coroutine error: " . $e->getMessage());
 
-                if (class_exists('\Nexph\Core\Context\ContextStore')) {
-                    $ctx = \Nexph\Core\Context\ContextStore::instance()->current();
+                if (class_exists('\nexphant\Core\Context\ContextStore')) {
+                    $ctx = \nexphant\Core\Context\ContextStore::instance()->current();
                     $ownerId = $ctx->ownerId();
-                    if ($ownerId && class_exists('\Nexph\Runtime\Runtime')) {
-                        $owner = \Nexph\Runtime\Runtime::owners()->get($ownerId);
+                    if ($ownerId && class_exists('\nexphant\Runtime\Runtime')) {
+                        $owner = \nexphant\Runtime\Runtime::owners()->get($ownerId);
                         if ($owner && $owner->isAlive()) {
                             $owner->close('fiber_error');
                         }
@@ -268,8 +268,8 @@ class FiberEventLoop
             $this->timerHeap->extract();
 
             // Check drain state before executing timer
-            if (class_exists('\Nexph\Core\Drain\DrainController')) {
-                $drainController = \Nexph\Core\Drain\DrainController::instance();
+            if (class_exists('\nexphant\Core\Drain\DrainController')) {
+                $drainController = \nexphant\Core\Drain\DrainController::instance();
                 if (!$drainController->isAccepting()) {
                     // Skip timer execution during drain
                     if ($timer['owner'] ?? null) {

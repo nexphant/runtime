@@ -1,11 +1,11 @@
-# Nexph Runtime
+# nexphant Runtime
 
-Runtime core for Nexph framework.
+Runtime core for nexphant framework.
 
 ## Installation
 
 ```bash
-composer require nexph/runtime
+composer require nexphant/runtime
 ```
 
 ## License

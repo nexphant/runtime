@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime\Adaptive;
+namespace nexphant\Runtime\Adaptive;
 
 /**
  * Runtime facade — wires all adaptive primitives for a single worker.

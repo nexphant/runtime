@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime\Sync;
+namespace nexphant\Runtime\Sync;
 
 class SysvSemaphore implements SemaphoreInterface
 {

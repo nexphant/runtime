@@ -1,8 +1,8 @@
 <?php
 
-namespace Nexph\Runtime\EventLoop;
+namespace nexphant\Runtime\EventLoop;
 
-use Nexph\Core\Context\ContextStore;
+use nexphant\Core\Context\ContextStore;
 use Event;
 use EventBase;
 
@@ -96,10 +96,10 @@ class EventEventLoop implements EventLoopInterface
         $context = ContextStore::instance()->current();
         $parentOwnerId = $context->ownerId();
         
-        $timerOwner = class_exists('\Nexph\Runtime\Runtime') && \Nexph\Runtime\Runtime::available()
-            ? \Nexph\Runtime\Runtime::owners()->open(
-                \Nexph\Core\Ownership\OwnerType::TIMER,
-                $parentOwnerId ? \Nexph\Runtime\Runtime::owners()->get($parentOwnerId)?->id() : null,
+        $timerOwner = class_exists('\nexphant\Runtime\Runtime') && \nexphant\Runtime\Runtime::available()
+            ? \nexphant\Runtime\Runtime::owners()->open(
+                \nexphant\Core\Ownership\OwnerType::TIMER,
+                $parentOwnerId ? \nexphant\Runtime\Runtime::owners()->get($parentOwnerId)?->id() : null,
                 ['interval' => $seconds, 'repeat' => $repeat]
             )
             : null;
@@ -107,8 +107,8 @@ class EventEventLoop implements EventLoopInterface
         $id = $this->nextTimerId++;
         
         $wrappedCallback = function() use ($callback, $context, $timerOwner, $id, $repeat) {
-            if (class_exists('\Nexph\Core\Drain\DrainController')) {
-                $drainController = \Nexph\Core\Drain\DrainController::instance();
+            if (class_exists('\nexphant\Core\Drain\DrainController')) {
+                $drainController = \nexphant\Core\Drain\DrainController::instance();
                 if (!$drainController->isAccepting()) {
                     if ($timerOwner) {
                         $timerOwner->close('timer_skipped_drain');
@@ -153,8 +153,8 @@ class EventEventLoop implements EventLoopInterface
             'owner' => $timerOwner,
         ];
         
-        if (class_exists('\Nexph\Core\Resource\ResourceRegistry') && $timerOwner) {
-            \Nexph\Core\Resource\ResourceRegistry::instance()->track(
+        if (class_exists('\nexphant\Core\Resource\ResourceRegistry') && $timerOwner) {
+            \nexphant\Core\Resource\ResourceRegistry::instance()->track(
                 (object)['timer_id' => $id],
                 'timer',
                 $timerOwner->id()

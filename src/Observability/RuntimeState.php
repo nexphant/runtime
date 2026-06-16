@@ -1,17 +1,17 @@
 <?php
 
 /**
- * This file is part of the Nexph Framework.
+ * This file is part of the nexphant Framework.
  *
  * (c) nexphant <https://github.com/nexphant>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Nexph\Runtime\Observability;
+namespace nexphant\Runtime\Observability;
 
-use Nexph\Queue\QueueFactory;
-use Nexph\Runtime\Runtime;
+use nexphant\Queue\QueueFactory;
+use nexphant\Runtime\Runtime;
 
 class RuntimeState
 {
@@ -79,9 +79,9 @@ class RuntimeState
         $port = isset($options['port']) ? (int) $options['port'] : (int) (getenv('PORT') ?: 0);
         $dirs = [];
         if ($port > 0) {
-            $dirs[] = sys_get_temp_dir() . '/nexph-http-' . $port;
+            $dirs[] = sys_get_temp_dir() . '/nexphant-http-' . $port;
         } else {
-            $dirs = glob(sys_get_temp_dir() . '/nexph-http-*') ?: [];
+            $dirs = glob(sys_get_temp_dir() . '/nexphant-http-*') ?: [];
         }
 
         $servers = [];
@@ -193,7 +193,7 @@ class RuntimeState
     {
         return [
             'running' => false,
-            'stats_dir' => $port > 0 ? sys_get_temp_dir() . '/nexph-http-' . $port : null,
+            'stats_dir' => $port > 0 ? sys_get_temp_dir() . '/nexphant-http-' . $port : null,
             'port' => $port ?: null,
             'pid' => null,
             'pids' => [],
@@ -222,7 +222,7 @@ class RuntimeState
 
     private static function portFromStatsDir(string $dir): ?int
     {
-        return preg_match('/nexph-http-(\d+)$/', $dir, $m) ? (int) $m[1] : null;
+        return preg_match('/nexphant-http-(\d+)$/', $dir, $m) ? (int) $m[1] : null;
     }
 
     private static function supervisorPid(array $workers): ?int

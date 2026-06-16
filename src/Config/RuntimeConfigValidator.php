@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime\Config;
+namespace nexphant\Runtime\Config;
 
 final class RuntimeConfigValidator
 {

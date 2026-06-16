@@ -1,11 +1,11 @@
 {
-    "name": "nexph/runtime",
-    "description": "Runtime core for Nexph framework",
+    "name": "nexphant/runtime",
+    "description": "Runtime core for nexphant framework",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Nexph\\Runtime\\": "src/"
+            "nexphant\\Runtime\\": "src/"
         }
     },
     "require": {
@@ -13,9 +13,9 @@
         "ext-pcntl": "*",
         "ext-posix": "*",
         "ext-pdo": "*",
-        "nexph/core": "^0.0",
-        "nexph/support": "^0.0",
-        "nexph/observability": "^0.0"
+        "nexphant/core": "^0.0",
+        "nexphant/support": "^0.0",
+        "nexphant/observability": "^0.0"
     },
     "suggest": {
         "ext-apcu": "For runtime cache and APCu queue driver",

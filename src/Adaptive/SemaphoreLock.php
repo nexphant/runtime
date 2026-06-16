@@ -1,6 +1,6 @@
 <?php
 
-namespace Nexph\Runtime\Adaptive;
+namespace nexphant\Runtime\Adaptive;
 
 /**
  * Lightweight semaphore abstraction.
@@ -27,7 +27,7 @@ final class SemaphoreLock
         }
 
         if (!$this->useSysv) {
-            $this->lockFile = $fallbackPath ?? (sys_get_temp_dir() . '/nexph-sem-' . $key . '.lock');
+            $this->lockFile = $fallbackPath ?? (sys_get_temp_dir() . '/nexphant-sem-' . $key . '.lock');
         }
     }
 

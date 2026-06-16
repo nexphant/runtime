@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Nexph\Runtime\Backpressure;
+namespace nexphant\Runtime\Backpressure;
 
-use Nexph\Core\Cancellation\CancellationToken;
-use Nexph\Core\Context\ContextStore;
-use Nexph\Core\Ownership\OwnerType;
+use nexphant\Core\Cancellation\CancellationToken;
+use nexphant\Core\Context\ContextStore;
+use nexphant\Core\Ownership\OwnerType;
 
 /**
  * Executor with bounded concurrency and queue
@@ -87,19 +87,19 @@ final class BoundedExecutor
     {
         $this->running++;
         
-        if (class_exists('\Nexph\Runtime\Runtime') && \Nexph\Runtime\Runtime::available()) {
-            \Nexph\Runtime\Runtime::spawn(function() use ($task, $token, $context) {
+        if (class_exists('\nexphant\Runtime\Runtime') && \nexphant\Runtime\Runtime::available()) {
+            \nexphant\Runtime\Runtime::spawn(function() use ($task, $token, $context) {
                 $parentOwnerId = $context->ownerId();
-                $taskOwner = \Nexph\Runtime\Runtime::owners()->open(
-                    \Nexph\Core\Ownership\OwnerType::EXECUTOR_TASK,
-                    $parentOwnerId ? \Nexph\Runtime\Runtime::owners()->get($parentOwnerId)?->id() : null,
+                $taskOwner = \nexphant\Runtime\Runtime::owners()->open(
+                    \nexphant\Core\Ownership\OwnerType::EXECUTOR_TASK,
+                    $parentOwnerId ? \nexphant\Runtime\Runtime::owners()->get($parentOwnerId)?->id() : null,
                     ['executor' => 'bounded']
                 );
                 
                 try {
                     $token?->throwIfCancelled();
                     $taskContext = $context->with(['owner_id' => $taskOwner->id()->toString(), 'owner_type' => 'executor_task']);
-                    \Nexph\Core\Context\ContextStore::instance()->runWith($taskContext, $task);
+                    \nexphant\Core\Context\ContextStore::instance()->runWith($taskContext, $task);
                     $this->metrics['completed']++;
                 } catch (\Throwable $e) {
                     $this->metrics['failed']++;
@@ -165,8 +165,8 @@ final class BoundedExecutor
                         $this->metrics['rejected']++;
                         return false;
                     }
-                    if (class_exists('\Nexph\Runtime\Runtime') && \Nexph\Runtime\Runtime::available()) {
-                        \Nexph\Runtime\Runtime::sleep(0.001);
+                    if (class_exists('\nexphant\Runtime\Runtime') && \nexphant\Runtime\Runtime::available()) {
+                        \nexphant\Runtime\Runtime::sleep(0.001);
                     } else {
                         usleep(1_000);
                     }

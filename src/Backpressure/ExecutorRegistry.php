@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Nexph\Runtime\Backpressure;
+namespace nexphant\Runtime\Backpressure;
 
 final class ExecutorRegistry
 {

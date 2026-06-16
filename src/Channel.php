@@ -1,18 +1,18 @@
 <?php
 
 /**
- * This file is part of the Nexph Framework.
+ * This file is part of the nexphant Framework.
  *
  * (c) nexphant <https://github.com/nexphant>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Nexph\Runtime;
+namespace nexphant\Runtime;
 
 use Fiber;
-use Nexph\Core\Cancellation\CancellationToken;
-use Nexph\Core\Cancellation\CancelledException;
+use nexphant\Core\Cancellation\CancellationToken;
+use nexphant\Core\Cancellation\CancelledException;
 
 /**
  * Lightweight channel for coroutine communication.
@@ -37,12 +37,12 @@ class Channel
         $this->capacity = max(0, $capacity);
 
         // Track channel as resource
-        if (class_exists('\Nexph\Core\Resource\ResourceRegistry') && class_exists('\Nexph\Runtime\Runtime') && \Nexph\Runtime\Runtime::available()) {
+        if (class_exists('\nexphant\Core\Resource\ResourceRegistry') && class_exists('\nexphant\Runtime\Runtime') && \nexphant\Runtime\Runtime::available()) {
             $this->resourceId = bin2hex(random_bytes(16));
-            \Nexph\Core\Resource\ResourceRegistry::instance()->track(
+            \nexphant\Core\Resource\ResourceRegistry::instance()->track(
                 $this,
                 'channel',
-                \Nexph\Runtime\Runtime::context()->ownerId()
+                \nexphant\Runtime\Runtime::context()->ownerId()
             );
         }
     }
@@ -228,8 +228,8 @@ class Channel
         $this->recvHead = 0;
 
         // Release from resource registry
-        if ($this->resourceId && class_exists('\Nexph\Core\Resource\ResourceRegistry')) {
-            \Nexph\Core\Resource\ResourceRegistry::instance()->release($this->resourceId);
+        if ($this->resourceId && class_exists('\nexphant\Core\Resource\ResourceRegistry')) {
+            \nexphant\Core\Resource\ResourceRegistry::instance()->release($this->resourceId);
         }
     }
 
