@@ -203,6 +203,9 @@ class FiberEventLoop
         // Execute ready coroutines
         $ready = $this->ready;
         $this->ready = [];
+        if (count($ready) > 50000) {
+            $ready = array_slice($ready, -50000);
+        }
 
         foreach ($ready as $coroutine) {
             if ($coroutine->isFinished()) {
@@ -336,6 +339,9 @@ class FiberEventLoop
             }
         }
         $this->sleeping = $stillSleeping;
+        if (count($this->sleeping) > 100000) {
+            $this->sleeping = array_slice($this->sleeping, -50000);
+        }
     }
 
     private function pollIO(): void

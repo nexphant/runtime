@@ -25,6 +25,7 @@ class Channel
     private array $buffer = [];
     private int $bufferHead = 0;
     private int $capacity;
+    private int $maxQueueSize;
     private array $sendQueue = [];
     private int $sendHead = 0;
     private array $recvQueue = [];
@@ -32,9 +33,10 @@ class Channel
     private bool $closed = false;
     private ?string $resourceId = null;
 
-    public function __construct(int $capacity = 0)
+    public function __construct(int $capacity = 0, int $maxQueueSize = 10000)
     {
         $this->capacity = max(0, $capacity);
+        $this->maxQueueSize = max(1, $maxQueueSize);
 
         // Track channel as resource
         if (class_exists('\Nexphant\Core\Resource\ResourceRegistry') && class_exists('\Nexphant\Runtime\Runtime') && \Nexphant\Runtime\Runtime::available()) {
@@ -89,6 +91,10 @@ class Channel
                 throw new \RuntimeException('Channel send must be called from within a fiber');
             }
 
+            if ($this->queueCount($this->sendQueue, $this->sendHead) >= $this->maxQueueSize) {
+                throw new \OverflowException('Channel send queue full');
+            }
+
             $this->sendQueue[] = ['fiber' => $fiber, 'value' => $value, 'deadline' => $deadline, 'token' => $token];
             Fiber::suspend(FiberCoroutine::SUSPEND_CHANNEL);
 
@@ -103,6 +109,10 @@ class Channel
         $fiber = Fiber::getCurrent();
         if ($fiber === null) {
             throw new \RuntimeException('Channel send must be called from within a fiber');
+        }
+
+        if ($this->queueCount($this->sendQueue, $this->sendHead) >= $this->maxQueueSize) {
+            throw new \OverflowException('Channel send queue full');
         }
 
         $this->sendQueue[] = ['fiber' => $fiber, 'value' => $value, 'deadline' => $deadline, 'token' => $token];
@@ -162,6 +172,10 @@ class Channel
         $fiber = Fiber::getCurrent();
         if ($fiber === null) {
             throw new \RuntimeException('Channel receive must be called from within a fiber');
+        }
+
+        if ($this->queueCount($this->recvQueue, $this->recvHead) >= $this->maxQueueSize) {
+            throw new \OverflowException('Channel receive queue full');
         }
 
         $this->recvQueue[] = ['fiber' => $fiber, 'deadline' => $deadline, 'token' => $token];

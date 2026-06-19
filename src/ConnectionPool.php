@@ -12,12 +12,14 @@ class ConnectionPool
     private static int $maxConnections = 10;
     private static int $idleTimeout = 300;
     private static int $sequence = 0;
+    private static int $acquireTimeoutMs = 5000;
 
     public static function configure(array $config): void
     {
         self::$config = $config;
         self::$maxConnections = max(1, (int) ($config['max_connections'] ?? 10));
         self::$idleTimeout = max(1, (int) ($config['idle_timeout'] ?? 300));
+        self::$acquireTimeoutMs = max(100, (int) ($config['acquire_timeout_ms'] ?? 5000));
     }
 
     public static function get(string $name = 'default'): DriverInterface
@@ -25,31 +27,40 @@ class ConnectionPool
         self::cleanup($name);
         self::$pools[$name] ??= [];
 
-        foreach (self::$pools[$name] as &$entry) {
-            if (!$entry['in_use']) {
-                $entry['in_use'] = true;
-                $entry['last_used'] = time();
-                $connection = $entry['connection'];
-                unset($entry);
+        $deadline = microtime(true) + self::$acquireTimeoutMs / 1000;
+
+        do {
+            foreach (self::$pools[$name] as &$entry) {
+                if (!$entry['in_use']) {
+                    $entry['in_use'] = true;
+                    $entry['last_used'] = time();
+                    $connection = $entry['connection'];
+                    unset($entry);
+                    return $connection;
+                }
+            }
+            unset($entry);
+
+            if (count(self::$pools[$name]) < self::$maxConnections) {
+                $poolName = self::poolName($name);
+                $connection = DB::connect(self::connectionConfig($name), $poolName);
+                self::$pools[$name][] = [
+                    'name' => $poolName,
+                    'connection' => $connection,
+                    'in_use' => true,
+                    'created' => time(),
+                    'last_used' => time(),
+                ];
                 return $connection;
             }
-        }
-        unset($entry);
 
-        if (count(self::$pools[$name]) >= self::$maxConnections) {
-            throw new \RuntimeException("Connection pool exhausted for '{$name}'");
-        }
+            if (microtime(true) >= $deadline) {
+                throw new \RuntimeException("Connection pool exhausted for '{$name}' (timeout: " . self::$acquireTimeoutMs . "ms)");
+            }
 
-        $poolName = self::poolName($name);
-        $connection = DB::connect(self::connectionConfig($name), $poolName);
-        self::$pools[$name][] = [
-            'name' => $poolName,
-            'connection' => $connection,
-            'in_use' => true,
-            'created' => time(),
-            'last_used' => time(),
-        ];
-        return $connection;
+            usleep(5000);
+            self::cleanup($name);
+        } while (true);
     }
 
     public static function release(object $connection, string $name = 'default'): void

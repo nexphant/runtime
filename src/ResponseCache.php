@@ -68,11 +68,14 @@ final class ResponseCache
             return;
         }
 
-        if (!isset(self::$store[$key])) {
-            self::$order[] = $key;
-            if (count(self::$order) > self::$maxEntries) {
-                unset(self::$store[array_shift(self::$order)]);
+        $isNew = !isset(self::$store[$key]);
+
+        if ($isNew) {
+            if (count(self::$order) >= self::$maxEntries) {
+                $evict = array_key_first(self::$order);
+                unset(self::$store[$evict], self::$order[$evict]);
             }
+            self::$order[$key] = true;
         }
 
         self::$store[$key] = [
@@ -108,11 +111,7 @@ final class ResponseCache
         }
 
         foreach ($keysToRemove as $key) {
-            unset(self::$store[$key]);
-        }
-
-        if (!empty($keysToRemove)) {
-            self::$order = array_values(array_diff(self::$order, $keysToRemove));
+            unset(self::$store[$key], self::$order[$key]);
         }
     }
 }
