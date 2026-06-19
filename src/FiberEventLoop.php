@@ -87,7 +87,7 @@ class FiberEventLoop
         $this->timerHeap->insert($id, -$next);
 
         // Track timer as resource
-        if (class_exists('\Nexphant\Core\Resource\ResourceRegistry') && $timerOwner) {
+        if (class_exists('\Nexphant\Core\Resource\ResourceRegistry') && $timerOwner && $timerOwner->id()) {
             \Nexphant\Core\Resource\ResourceRegistry::instance()->track(
                 (object) ['timer_id' => $id],
                 'timer',

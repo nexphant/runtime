@@ -46,7 +46,7 @@ class MemoryMonitor
         $first = $window[0]['usage'];
         $last = $window[count($window) - 1]['usage'];
         $growth = $last - $first;
-        $growthRate = $first > 0 ? $growth / $first : 0;
+        $growthRate = ($first > 0) ? ($growth / $first) : 0;
 
         // Check monotonic increase
         $increasing = 0;

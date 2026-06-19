@@ -230,7 +230,7 @@ class RuntimeState
         $parents = [];
         foreach ($workers as $worker) {
             $pid = (int) ($worker['pid'] ?? 0);
-            if ($pid <= 0 || !is_readable("/proc/{$pid}/status")) {
+            if ($pid <= 0 || $pid !== (int) $pid || !is_readable("/proc/{$pid}/status")) {
                 continue;
             }
             $status = @file_get_contents("/proc/{$pid}/status");
@@ -246,7 +246,7 @@ class RuntimeState
 
     private static function isLiveProcess(int $pid): bool
     {
-        if ($pid <= 1 || !function_exists('posix_kill') || !@posix_kill($pid, 0)) {
+        if ($pid <= 1 || $pid !== (int) $pid || !function_exists('posix_kill') || !@posix_kill($pid, 0)) {
             return false;
         }
         $statusFile = "/proc/{$pid}/status";
