@@ -90,6 +90,22 @@ final class ResponseCache
         self::$order = [];
     }
 
+    public static function cleanup(): void
+    {
+        if (!self::$enabled || self::$shared) {
+            return;
+        }
+
+        $now = microtime(true);
+        $removed = 0;
+        foreach (self::$store as $key => $entry) {
+            if ($entry['expires'] < $now) {
+                unset(self::$store[$key], self::$order[$key]);
+                $removed++;
+            }
+        }
+    }
+
     public static function invalidatePath(string $path): void
     {
         if (!self::$enabled || empty(self::$store)) {
