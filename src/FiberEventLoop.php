@@ -247,7 +247,7 @@ class FiberEventLoop
             $nextWake = $this->nextWakeTime();
             $sleepTime = $nextWake !== null ? max(0, $nextWake - microtime(true)) : 0;
             if ($sleepTime > 0) {
-                usleep((int) min($sleepTime * 1_000_000, 10_000));
+                usleep((int) max(100, min($sleepTime * 1_000_000, 10_000)));
             }
         }
     }

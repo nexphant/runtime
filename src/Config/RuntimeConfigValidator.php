@@ -25,6 +25,15 @@ final class RuntimeConfigValidator
             $this->errors[] = 'drain_timeout must be positive';
         }
 
+        $redisUrl = $config->get('redis_url', '');
+        if ($redisUrl !== '') {
+            $host = parse_url((string) $redisUrl, PHP_URL_HOST) ?? '';
+            if (preg_match('/^(127\.|10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.|::1$|localhost$)/i', $host)) {
+                // allow private hosts in non-production only — log warning
+                error_log("Warning: redis_url points to private/loopback host: {$host}");
+            }
+        }
+
         foreach (['runtime_discipline', 'object_tracking', 'resource_trace', 'leak_detection'] as $flag) {
             $value = $config->get($flag, false);
             if (!is_bool($value)) {

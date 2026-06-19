@@ -131,6 +131,19 @@ class EvEventLoop implements EventLoopInterface
     public function stop(): void
     {
         $this->running = false;
+        foreach ($this->timers as $watcher) {
+            $watcher->stop();
+        }
+        foreach ($this->readers as $watcher) {
+            $watcher->stop();
+        }
+        foreach ($this->writers as $watcher) {
+            $watcher->stop();
+        }
+        foreach ($this->signals as $watcher) {
+            $watcher->stop();
+        }
+        $this->timers = [];
         \Ev::stop();
     }
 

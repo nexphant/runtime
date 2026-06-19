@@ -21,6 +21,14 @@ class UvEventLoop implements EventLoopInterface
         $this->loop = uv_loop_new();
     }
 
+    public function __destruct()
+    {
+        if ($this->loop !== null) {
+            uv_loop_delete($this->loop);
+            $this->loop = null;
+        }
+    }
+
     public function onReadable($stream, callable $callback): void
     {
         $key = is_resource($stream) ? (int) $stream : spl_object_id($stream);
