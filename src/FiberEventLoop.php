@@ -29,6 +29,7 @@ class FiberEventLoop
     private \SplPriorityQueue $timerHeap;
     private bool $running = false;
     private int $nextTimerId = 1;
+    private int $cancelledCount = 0;
     /** @var resource[] */
     private array $readStreams = [];
     private array $readCallbacks = [];
@@ -112,6 +113,22 @@ class FiberEventLoop
             }
         }
         unset($this->timers[$id]);
+        
+        $this->cancelledCount++;
+        if ($this->cancelledCount > 1000) {
+            $this->rebuildTimerHeap();
+            $this->cancelledCount = 0;
+        }
+    }
+    
+    private function rebuildTimerHeap(): void
+    {
+        $this->timerHeap = new \SplPriorityQueue();
+        $this->timerHeap->setExtractFlags(\SplPriorityQueue::EXTR_DATA);
+        
+        foreach ($this->timers as $id => $timer) {
+            $this->timerHeap->insert($id, -$timer['next']);
+        }
     }
 
     /**
