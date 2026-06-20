@@ -185,6 +185,90 @@ class Runtime
     }
 
     /**
+     * Get memory monitor.
+     */
+    public static function memoryMonitor(): MemoryMonitor
+    {
+        static $monitor = null;
+        if ($monitor === null) {
+            $monitor = new MemoryMonitor();
+        }
+        return $monitor;
+    }
+
+    /**
+     * Get memory leak detector.
+     */
+    public static function leakDetector(): MemoryLeakDetector
+    {
+        static $detector = null;
+        if ($detector === null) {
+            $detector = new MemoryLeakDetector();
+        }
+        return $detector;
+    }
+
+    /**
+     * Get current memory usage.
+     */
+    public static function memoryUsage(bool $realUsage = true): int
+    {
+        return memory_get_usage($realUsage);
+    }
+
+    /**
+     * Get memory limit from ini.
+     */
+    public static function memoryLimit(): int
+    {
+        $limit = ini_get('memory_limit');
+        if ($limit === '-1') {
+            return -1;
+        }
+        return self::parseMemoryString($limit);
+    }
+
+    /**
+     * Get memory usage percentage.
+     */
+    public static function memoryPressure(): float
+    {
+        $limit = self::memoryLimit();
+        if ($limit <= 0) {
+            return 0.0;
+        }
+        return memory_get_usage(true) / $limit;
+    }
+
+    /**
+     * Force garbage collection.
+     */
+    public static function gc(): int
+    {
+        $before = memory_get_usage(true);
+        gc_collect_cycles();
+        gc_mem_caches();
+        $after = memory_get_usage(true);
+        return $before - $after;
+    }
+
+    /**
+     * Parse memory string to bytes.
+     */
+    private static function parseMemoryString(string $val): int
+    {
+        $val = trim($val);
+        $last = strtolower($val[strlen($val) - 1]);
+        $val = (int) $val;
+        switch ($last) {
+            case 'g': $val *= 1024;
+            case 'm': $val *= 1024;
+            case 'k': $val *= 1024;
+        }
+        return $val;
+    }
+
+    /**
      * Get runtime metrics snapshot.
      */
     public static function metrics(): RuntimeMetrics
