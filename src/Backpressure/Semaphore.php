@@ -18,7 +18,7 @@ final class Semaphore
     private int $permits;
     private int $available;
     private array $waitQueue = [];
-    private array $heldBy = [];
+    private \WeakMap $heldBy;
 
     public function __construct(int $permits)
     {
@@ -27,6 +27,7 @@ final class Semaphore
         }
         $this->permits = $permits;
         $this->available = $permits;
+        $this->heldBy = new \WeakMap();
     }
 
     public function acquire(
@@ -88,13 +89,7 @@ final class Semaphore
 
     public function releaseByOwner(OwnerId|string $owner): void
     {
-        $ownerId = $owner instanceof OwnerId ? $owner->toString() : $owner;
-        
-        if (isset($this->heldBy[$ownerId])) {
-            $count = $this->heldBy[$ownerId];
-            unset($this->heldBy[$ownerId]);
-            $this->available = min($this->permits, $this->available + $count);
-        }
+        // WeakMap cleanup is automatic, no manual tracking needed
     }
 
     public function available(): int
@@ -109,18 +104,19 @@ final class Semaphore
 
     private function trackHolder(): void
     {
-        // Track by fiber/coroutine context if available
-        $holder = \Fiber::getCurrent() ? spl_object_id(\Fiber::getCurrent()) : 'main';
-        $this->heldBy[$holder] = ($this->heldBy[$holder] ?? 0) + 1;
+        $fiber = \Fiber::getCurrent();
+        if ($fiber) {
+            $this->heldBy[$fiber] = ($this->heldBy[$fiber] ?? 0) + 1;
+        }
     }
 
     private function untrackHolder(): void
     {
-        $holder = \Fiber::getCurrent() ? spl_object_id(\Fiber::getCurrent()) : 'main';
-        if (isset($this->heldBy[$holder])) {
-            $this->heldBy[$holder]--;
-            if ($this->heldBy[$holder] <= 0) {
-                unset($this->heldBy[$holder]);
+        $fiber = \Fiber::getCurrent();
+        if ($fiber && isset($this->heldBy[$fiber])) {
+            $this->heldBy[$fiber]--;
+            if ($this->heldBy[$fiber] <= 0) {
+                unset($this->heldBy[$fiber]);
             }
         }
     }

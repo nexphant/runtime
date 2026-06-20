@@ -21,6 +21,8 @@ use Nexphant\Core\Context\ContextStore;
  */
 class FiberEventLoop
 {
+    private const MAX_SLEEPING = 10000;
+    private const MAX_READY = 10000;
     private array $ready = [];
     private array $sleeping = [];
     private array $timers = [];
@@ -203,8 +205,9 @@ class FiberEventLoop
         // Execute ready coroutines
         $ready = $this->ready;
         $this->ready = [];
-        if (count($ready) > 50000) {
-            $ready = array_slice($ready, -50000);
+        
+        if (count($ready) > self::MAX_READY) {
+            throw new \RuntimeException("Event loop ready queue saturated: " . count($ready) . " > " . self::MAX_READY);
         }
 
         foreach ($ready as $coroutine) {
@@ -339,8 +342,10 @@ class FiberEventLoop
             }
         }
         $this->sleeping = $stillSleeping;
-        if (count($this->sleeping) > 100000) {
-            $this->sleeping = array_slice($this->sleeping, -50000);
+        
+        if (count($this->sleeping) > self::MAX_SLEEPING) {
+            error_log("[FiberEventLoop] Max sleeping fibers exceeded: " . count($this->sleeping) . " > " . self::MAX_SLEEPING);
+            $this->sleeping = array_slice($this->sleeping, -self::MAX_SLEEPING);
         }
     }
 
