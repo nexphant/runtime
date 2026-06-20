@@ -13,6 +13,8 @@ final class MetricsCollector
     private array $counters = [];
     private array $histograms = [];
     private array $gauges = [];
+    private int $maxHistograms = 100;
+    private int $maxHistogramValues = 1000;
 
     private function __construct()
     {
@@ -40,10 +42,13 @@ final class MetricsCollector
 
     public function observe(string $name, float $value, array $labels = []): void
     {
-        // Merge runtime context labels if available
         $labels = $this->mergeRuntimeLabels($labels);
-        
         $key = $this->key($name, $labels);
+        
+        if (count($this->histograms) >= $this->maxHistograms && !isset($this->histograms[$key])) {
+            return;
+        }
+        
         if (!isset($this->histograms[$key])) {
             $this->histograms[$key] = [
                 'name' => $name,
@@ -53,7 +58,11 @@ final class MetricsCollector
                 'sum' => 0.0,
             ];
         }
-        $this->histograms[$key]['values'][] = $value;
+        
+        if (count($this->histograms[$key]['values']) < $this->maxHistogramValues) {
+            $this->histograms[$key]['values'][] = $value;
+        }
+        
         $this->histograms[$key]['count']++;
         $this->histograms[$key]['sum'] += $value;
     }
