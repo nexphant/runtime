@@ -40,7 +40,9 @@ class Worker
         $maxIterations = $options['max_iterations'] ?? 0;
         $sleepBetween = $options['sleep'] ?? 1.0;
         $drainTimeout = $options['drain_timeout'] ?? 30.0;
+        $maxBackoff = $options['max_backoff'] ?? 60.0;
         $iteration = 0;
+        $consecutiveErrors = 0;
 
         echo "[Worker] Starting...\n";
 
@@ -59,6 +61,7 @@ class Worker
             try {
                 $callback();
                 $iteration++;
+                $consecutiveErrors = 0; // reset on success
 
                 if ($maxIterations > 0 && $iteration >= $maxIterations) {
                     echo "[Worker] Max iterations reached\n";
@@ -69,8 +72,10 @@ class Worker
                     Runtime::sleep($sleepBetween);
                 }
             } catch (\Throwable $e) {
-                error_log("[Worker] Error: " . $e->getMessage());
-                Runtime::sleep(5.0); // backoff on error
+                $consecutiveErrors++;
+                $backoff = min($maxBackoff, 2 ** min($consecutiveErrors, 10));
+                error_log("[Worker] Error (#{$consecutiveErrors}): " . $e->getMessage() . " — backoff {$backoff}s");
+                Runtime::sleep((float) $backoff);
             }
         }
 

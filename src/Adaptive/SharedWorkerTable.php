@@ -105,14 +105,61 @@ final class SharedWorkerTable
 
     public function readAll(): array
     {
-        $result = [];
-        for ($i = 1; $i <= self::MAX_WORKERS; $i++) {
-            $r = $this->read($i);
-            if ($r !== null && $r['updated_at'] > 0) {
-                $result[] = $r;
-            }
+        // Bulk read: acquire lock once, read entire shm block in one syscall
+        if ($this->useShmop && $this->shm) {
+            return $this->lock->locked(function () {
+                $totalSize = self::RECORD_SIZE * self::MAX_WORKERS;
+                $raw = shmop_read($this->shm, 0, $totalSize);
+                if ($raw === false) {
+                    return [];
+                }
+                $result = [];
+                for ($i = 0; $i < self::MAX_WORKERS; $i++) {
+                    $chunk = substr($raw, $i * self::RECORD_SIZE, self::RECORD_SIZE);
+                    $u = unpack('P6', $chunk);
+                    if (!$u || $u[6] === 0) {
+                        continue;
+                    }
+                    $result[] = [
+                        'worker_id'          => $u[1],
+                        'active_connections' => $u[2],
+                        'active_requests'    => $u[3],
+                        'pending_writes'     => $u[4],
+                        'pressure_score'     => $u[5] / 1e6,
+                        'updated_at'         => $u[6] / 1e6,
+                    ];
+                }
+                return $result;
+            });
         }
-        return $result;
+
+        // sysvshm fallback: still per-record but single lock acquire
+        return $this->lock->locked(function () {
+            $result = [];
+            for ($i = 1; $i <= self::MAX_WORKERS; $i++) {
+                $offset = ($i - 1) * self::RECORD_SIZE;
+                if (!$this->sysvShm || !shm_has_var($this->sysvShm, $offset)) {
+                    continue;
+                }
+                $raw = shm_get_var($this->sysvShm, $offset);
+                if (!$raw) {
+                    continue;
+                }
+                $u = unpack('P6', $raw);
+                if (!$u || $u[6] === 0) {
+                    continue;
+                }
+                $result[] = [
+                    'worker_id'          => $u[1],
+                    'active_connections' => $u[2],
+                    'active_requests'    => $u[3],
+                    'pending_writes'     => $u[4],
+                    'pressure_score'     => $u[5] / 1e6,
+                    'updated_at'         => $u[6] / 1e6,
+                ];
+            }
+            return $result;
+        });
     }
 
     /**

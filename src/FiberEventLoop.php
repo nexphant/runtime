@@ -27,6 +27,7 @@ class FiberEventLoop
     private array $sleeping = [];
     private array $timers = [];
     private \SplPriorityQueue $timerHeap;
+    private \SplPriorityQueue $sleepHeap;
     private bool $running = false;
     private int $nextTimerId = 1;
     private int $cancelledCount = 0;
@@ -41,6 +42,8 @@ class FiberEventLoop
     {
         $this->timerHeap = new \SplPriorityQueue();
         $this->timerHeap->setExtractFlags(\SplPriorityQueue::EXTR_DATA);
+        $this->sleepHeap = new \SplPriorityQueue();
+        $this->sleepHeap->setExtractFlags(\SplPriorityQueue::EXTR_DATA);
     }
 
     /**
@@ -53,10 +56,13 @@ class FiberEventLoop
 
     /**
      * Schedule fiber to wake after delay.
+     * Uses min-heap for O(log n) insertion instead of linear array scan.
      */
     public function sleepFiber(Fiber $fiber, float $seconds): void
     {
-        $this->sleeping[] = ['fiber' => $fiber, 'wake' => microtime(true) + $seconds];
+        $wake = microtime(true) + $seconds;
+        $this->sleeping[] = ['fiber' => $fiber, 'wake' => $wake];
+        $this->sleepHeap->insert(count($this->sleeping) - 1, -$wake);
     }
 
     /**
@@ -343,26 +349,48 @@ class FiberEventLoop
 
     private function processSleeping(float $now): void
     {
-        $stillSleeping = [];
-        foreach ($this->sleeping as $item) {
-            if ($item['wake'] <= $now) {
-                if ($item['fiber']->isTerminated()) {
-                    continue;
-                }
-                if ($item['fiber']->isSuspended()) {
-                    $coroutine = new FiberCoroutine($item['fiber']);
-                    $coroutine->markStarted();
-                    $this->ready[] = $coroutine;
-                }
-            } else {
-                $stillSleeping[] = $item;
+        // Drain heap of all items whose wake time has passed — O(k log n)
+        while (!$this->sleepHeap->isEmpty()) {
+            $idx = $this->sleepHeap->top();
+
+            // Entry may have been nulled out (fiber already processed)
+            if (!isset($this->sleeping[$idx])) {
+                $this->sleepHeap->extract();
+                continue;
+            }
+
+            $item = $this->sleeping[$idx];
+
+            if ($item['wake'] > $now) {
+                break; // All remaining fibers are still sleeping
+            }
+
+            $this->sleepHeap->extract();
+            unset($this->sleeping[$idx]);
+
+            if ($item['fiber']->isTerminated()) {
+                continue;
+            }
+
+            if ($item['fiber']->isSuspended()) {
+                $coroutine = new FiberCoroutine($item['fiber']);
+                $coroutine->markStarted();
+                $this->ready[] = $coroutine;
             }
         }
-        $this->sleeping = $stillSleeping;
-        
-        if (count($this->sleeping) > self::MAX_SLEEPING) {
+
+        // Compact sleeping array periodically to avoid index bloat
+        if (count($this->sleeping) === 0) {
+            $this->sleeping = [];
+        } elseif (count($this->sleeping) > self::MAX_SLEEPING) {
             error_log("[FiberEventLoop] Max sleeping fibers exceeded: " . count($this->sleeping) . " > " . self::MAX_SLEEPING);
-            $this->sleeping = array_slice($this->sleeping, -self::MAX_SLEEPING);
+            // Rebuild heap after truncation
+            $this->sleeping = array_values(array_slice($this->sleeping, -self::MAX_SLEEPING, null, true));
+            $this->sleepHeap = new \SplPriorityQueue();
+            $this->sleepHeap->setExtractFlags(\SplPriorityQueue::EXTR_DATA);
+            foreach ($this->sleeping as $i => $item) {
+                $this->sleepHeap->insert($i, -$item['wake']);
+            }
         }
     }
 
@@ -409,8 +437,15 @@ class FiberEventLoop
     {
         $next = null;
 
-        foreach ($this->sleeping as $item) {
-            $next = $next === null ? $item['wake'] : min($next, $item['wake']);
+        // O(1) peek at earliest sleeping fiber via heap
+        while (!$this->sleepHeap->isEmpty()) {
+            $idx = $this->sleepHeap->top();
+            if (!isset($this->sleeping[$idx])) {
+                $this->sleepHeap->extract();
+                continue;
+            }
+            $next = $this->sleeping[$idx]['wake'];
+            break;
         }
 
         // Check heap top

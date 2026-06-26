@@ -14,6 +14,9 @@ class ConnectionPool
     private static int $sequence = 0;
     private static int $acquireTimeoutMs = 5000;
 
+    /** @var array<string, array<int, Fiber>> Fibers waiting for a free connection per pool name */
+    private static array $waiters = [];
+
     public static function configure(array $config): void
     {
         self::$config = $config;
@@ -58,7 +61,17 @@ class ConnectionPool
                 throw new \RuntimeException("Connection pool exhausted for '{$name}' (timeout: " . self::$acquireTimeoutMs . "ms)");
             }
 
-            usleep(5000);
+            // Yield to event loop if inside a Fiber, otherwise fallback to usleep
+            if (\Fiber::getCurrent() !== null) {
+                self::$waiters[$name][] = \Fiber::getCurrent();
+                \Fiber::suspend();
+                // Re-check deadline after resume
+                if (microtime(true) >= $deadline) {
+                    throw new \RuntimeException("Connection pool exhausted for '{$name}' (timeout: " . self::$acquireTimeoutMs . "ms)");
+                }
+            } else {
+                usleep(5000);
+            }
             self::cleanup($name);
         } while (true);
     }
@@ -73,6 +86,11 @@ class ConnectionPool
                 $entry['in_use'] = false;
                 $entry['last_used'] = time();
                 unset($entry);
+                // Resume one waiting Fiber, if any
+                if (!empty(self::$waiters[$name])) {
+                    $waiter = array_shift(self::$waiters[$name]);
+                    $waiter->resume();
+                }
                 return;
             }
         }

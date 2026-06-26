@@ -71,8 +71,15 @@ final class AdaptiveRuntime
         }
     }
 
+    /**
+     * Returns current pressure score.
+     * Reuses cached value if acceptLimit() was already called this tick.
+     */
     public function pressure(): float
     {
+        if ($this->stats->pressureCalculatedThisTick) {
+            return $this->stats->runtimePressureScore;
+        }
         return $this->scorer->calculate($this->stats);
     }
 

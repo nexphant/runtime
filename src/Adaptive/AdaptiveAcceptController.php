@@ -23,11 +23,13 @@ final class AdaptiveAcceptController
 
     /**
      * Compute accepts allowed for this tick based on current pressure.
+     * Stores calculated pressure in stats so callers can read it without recalculating.
      */
     public function acceptLimit(WorkerLocalStats $stats): int
     {
         $pressure = $this->scorer->calculate($stats);
         $stats->runtimePressureScore = $pressure;
+        $stats->pressureCalculatedThisTick = true;
 
         if ($pressure >= RuntimePressureScore::BUSY) {
             $stats->acceptPaused = false;

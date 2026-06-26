@@ -15,6 +15,8 @@ final class WorkerLocalStats
     public float $loopTickDuration = 0.0;
     public bool $acceptPaused = false;
     public float $runtimePressureScore = 0.0;
+    /** @internal Set by AdaptiveAcceptController to avoid double calculation per tick */
+    public bool $pressureCalculatedThisTick = false;
 
     private float $tickStart = 0.0;
 
